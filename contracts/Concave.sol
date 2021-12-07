@@ -19,7 +19,10 @@ contract ConcaveNFT is ERC721Enumerable, Pausable, Ownable {
     uint256 public maxMintAmount = 10;
     uint256 public price = 0.03 ether;
     bool public revealed = false;
-    ERC721 public requiredNFT = ERC721(0x9fdb31F8CE3cB8400C7cCb2299492F2A498330a4);
+    bool public presaleActive = true;
+    ERC721Enumerable public requiredNFT = ERC721Enumerable(0x9fdb31F8CE3cB8400C7cCb2299492F2A498330a4);
+
+    mapping(uint256 => uint256) public hasClaimed;
 
     constructor(
         string memory _name,
@@ -46,10 +49,21 @@ contract ConcaveNFT is ERC721Enumerable, Pausable, Ownable {
         require(_mintAmount > 0,"minting zero");
         require(_mintAmount <= maxMintAmount,"minting too many");
         require(totalSupply()+_mintAmount <= maxSupply,"no enough supply");
-        if (totalSupply() > 200 && requiredNFT.balanceOf(msg.sender) == 0) {
+        if (totalSupply() > 200 || !presaleActive) {
             require(msg.value >= price*_mintAmount, "insufficient funds");
+        } else {
+            require(requiredNFT.balanceOf(msg.sender) > 0, "msg.sender is not a TheColorsNFT holder");
+            uint256 validMintAmount = 0;
+            for (uint i = 0; i < requiredNFT.balanceOf(msg.sender); i++) {
+                uint256 claimTokenId = requiredNFT.tokenOfOwnerByIndex(msg.sender, i);
+                if (hasClaimed[claimTokenId] < 2) {
+                    validMintAmount += 2 - hasClaimed[claimTokenId];
+                    hasClaimed[claimTokenId]++;
+                }
+            }
+            require(validMintAmount > 0, "no valid NFTs left to claim with");
+            require(_mintAmount <= validMintAmount, "msg.sender exceeding the maximum cap of free mint");
         }
-
         for (uint i = 0; i < _mintAmount; i++) {
             uint256 newItemId = _tokenIds.current();
             _mint(msg.sender, newItemId);
@@ -94,8 +108,10 @@ contract ConcaveNFT is ERC721Enumerable, Pausable, Ownable {
     function setPrice(uint256 _price) public onlyOwner {
         price = _price;
     }
-    function setRequiredNFT(ERC721 _requiredNFT) public onlyOwner {
+    function setRequiredNFT(ERC721Enumerable _requiredNFT) public onlyOwner {
         requiredNFT = _requiredNFT;
     }
-
+    function setPresaleStatus(bool _presaleActive) public onlyOwner {
+        presaleActive = _presaleActive;
+    }
 }
