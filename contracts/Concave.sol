@@ -19,6 +19,7 @@ contract ConcaveNFT is ERC721Enumerable, Pausable, Ownable {
     uint256 public maxMintAmount = 10;
     uint256 public price = 0.03 ether;
     bool public revealed = false;
+    ERC721 public THE_COLORS = ERC721(0x9fdb31F8CE3cB8400C7cCb2299492F2A498330a4);
 
     constructor(
         string memory _name,
@@ -45,8 +46,10 @@ contract ConcaveNFT is ERC721Enumerable, Pausable, Ownable {
         require(_mintAmount > 0,"minting zero");
         require(_mintAmount <= maxMintAmount,"minting too many");
         require(totalSupply()+_mintAmount <= maxSupply,"no enough supply");
-        if (totalSupply() >= 200) {
+        if (totalSupply() > 200) {
             require(msg.value >= price*_mintAmount, "insufficient funds");
+        } else {
+            require(THE_COLORS.balanceOf(msg.sender) > 0, "msg.sender is not a TheColorsNFT holder");
         }
         for (uint i = 0; i < _mintAmount; i++) {
             uint256 newItemId = _tokenIds.current();
