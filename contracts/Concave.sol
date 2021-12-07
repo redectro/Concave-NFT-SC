@@ -7,6 +7,7 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "hardhat/console.sol";
+import './colors/INFTOwner.sol';
 
 contract ConcaveNFT is ERC721Enumerable, Pausable, Ownable {
     using Strings for uint256;
@@ -19,10 +20,16 @@ contract ConcaveNFT is ERC721Enumerable, Pausable, Ownable {
     uint256 public maxMintAmount = 10;
     uint256 public price = 0.03 ether;
     bool public revealed = false;
+<<<<<<< Updated upstream
     bool public presaleActive = true;
     ERC721Enumerable public requiredNFT = ERC721Enumerable(0x9fdb31F8CE3cB8400C7cCb2299492F2A498330a4);
 
     mapping(uint256 => uint256) public hasClaimed;
+=======
+    mapping (address => uint256) public hasMinted;
+
+    address public THE_COLORS = address(0x9fdb31F8CE3cB8400C7cCb2299492F2A498330a4);
+>>>>>>> Stashed changes
 
     constructor(
         string memory _name,
@@ -52,6 +59,7 @@ contract ConcaveNFT is ERC721Enumerable, Pausable, Ownable {
         if (totalSupply() > 200 || !presaleActive) {
             require(msg.value >= price*_mintAmount, "insufficient funds");
         } else {
+<<<<<<< Updated upstream
             require(requiredNFT.balanceOf(msg.sender) > 0, "msg.sender is not a TheColorsNFT holder");
             uint256 validMintAmount = 0;
             for (uint i = 0; i < requiredNFT.balanceOf(msg.sender); i++) {
@@ -63,11 +71,17 @@ contract ConcaveNFT is ERC721Enumerable, Pausable, Ownable {
             }
             require(validMintAmount > 0, "no valid NFTs left to claim with");
             require(_mintAmount <= validMintAmount, "msg.sender exceeding the maximum cap of free mint");
+=======
+            if(INFTOwner(THE_COLORS).balanceOf(msg.sender) < 1 || hasMinted[msg.sender] > 2 * INFTOwner(THE_COLORS).balanceOf(msg.sender)){
+                require(msg.value >= price*_mintAmount, "insufficient funds");
+            }
+>>>>>>> Stashed changes
         }
         for (uint i = 0; i < _mintAmount; i++) {
             uint256 newItemId = _tokenIds.current();
             _mint(msg.sender, newItemId);
             _tokenIds.increment();
+            hasMinted[msg.sender]++;
         }
         return _mintAmount;
     }
