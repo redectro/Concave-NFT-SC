@@ -54,7 +54,7 @@ contract ConcaveNFT is ERC721Enumerable, Pausable, Ownable {
         } else {
             require(requiredNFT.balanceOf(msg.sender) > 0, "msg.sender is not a TheColorsNFT holder");
             uint256 validMintAmount = 0;
-            for (uint i = 0; i <= requiredNFT.balanceOf(msg.sender); i++) {
+            for (uint i = 0; i < requiredNFT.balanceOf(msg.sender); i++) {
                 uint256 claimTokenId = requiredNFT.tokenOfOwnerByIndex(msg.sender, i);
                 if (hasClaimed[claimTokenId] < 2) {
                     validMintAmount += 2 - hasClaimed[claimTokenId];
