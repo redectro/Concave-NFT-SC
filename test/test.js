@@ -1,6 +1,8 @@
 const { expect } = require("chai");
 const { ethers, waffle } = require("hardhat");
 
+const colorsOwner = "0xfA8F061675f46CB9e71308BDf3C1C15E35011AC2"
+let colorsOwnerSigner;
 
 const THE_COLORS = '0x9fdb31F8CE3cB8400C7cCb2299492F2A498330a4';
 const TREASURY = '0x48aE900E9Df45441B2001dB4dA92CE0E7C08c6d2';
@@ -10,8 +12,8 @@ const TOTAL_COLORS_QUOTA = 200;
 
 const _name = 'ConcaveName';
 const _symbol = 'ConcaveSymbol';
-const _initBaseURI = 'Base URI';
-const _initNotRevealedUri = 'Unrevealed Base URI';
+const _initBaseURI = 'ipfs://BaseURI/';
+const _initNotRevealedUri = 'ipfs://unrevealedURI/';
 const maxMintAmount = 10;
 const price_in_ether = 0.04;
 const price = ethers.utils.parseEther(price_in_ether.toString());
@@ -34,7 +36,23 @@ const deploy = async () => {
     console.log('>_')
 }
 
+const getColorsMinter = async () => {
+    await hre.network.provider.request({
+      method: "hardhat_impersonateAccount",
+      params: [colorsOwner],
+    });
+    await network.provider.send("hardhat_setBalance", [
+      colorsOwner,
+      ethers.utils.parseEther('10.0').toHexString().replace("0x0", "0x"),
+    ]);
+    colorsOwnerSigner = await ethers.provider.getSigner(colorsOwner);
+}
 
+const mint = async (colorsOwnerSigner,_mintAmount) => {
+    await concavenft.connect(colorsOwnerSigner).mint(_mintAmount);
+}
+
+/*
 describe("ConcaveNFT: Reads public constants", () => {
     before(deploy)
 
@@ -51,7 +69,6 @@ describe("ConcaveNFT: Reads public constants", () => {
         expect(await concavenft.TOTAL_COLORS_QUOTA()).to.equal(TOTAL_COLORS_QUOTA)
     })
 
-    // it(``, async () => {})
 });
 
 describe("ConcaveNFT: Reads public variables", () => {
@@ -88,11 +105,11 @@ describe("ConcaveNFT: Reads public variables", () => {
         expect(await concavenft.isPublicMintActive()).to.equal(false)
     })
 
-    // it(``, async () => {})
 });
-
+*/
 describe("ConcaveNFT: Owner functions", () => {
     beforeEach(deploy)
+    /*
     describe("unpause()", () => {
         it(`Third party calling unpause() should revert with "Ownable: caller is not the owner"`, async () => {
             await expect(
@@ -191,7 +208,6 @@ describe("ConcaveNFT: Owner functions", () => {
         })
     })
 
-
     describe("setMaxMintAmount()", () => {
         it(`Third party calling setMaxMintAmount() should revert with "Ownable: caller is not the owner"`, async () => {
             await expect(
@@ -247,8 +263,6 @@ describe("ConcaveNFT: Owner functions", () => {
         it(`Owner calling setPublicMintActive() should pass"`, async () => {
             await concavenft.setPublicMintActive(true);
         })
-
-
         it(`Calling setPublicMintActive() with parameter "true" should make isPublicMintActive return "true"`, async () => {
             await concavenft.setPublicMintActive(true);
             expect(await concavenft.isPublicMintActive()).to.equal(true);
@@ -262,9 +276,36 @@ describe("ConcaveNFT: Owner functions", () => {
             expect(await concavenft.isPublicMintActive()).to.equal(true);
         })
     })
+    */
+    describe("tokenURI()", () => {
+        it(`Calling tokenURI() on nonexistent tokenId should revert with "ERC721Metadata: URI query for nonexistent token"`, async () => {
+            await expect(
+                concavenft.tokenURI(0)
+            ).to.be.revertedWith("ERC721Metadata: URI query for nonexistent token")
+        })
+        it(`Calling tokenURI() on an existing tokenId when not revealed should return "${_initNotRevealedUri}"`, async () => {
+            await concavenft.unpause();
+            await getColorsMinter()
+            await mint(colorsOwnerSigner,1)
+            expect(
+                await concavenft.tokenURI(0)
+            ).to.equal(_initNotRevealedUri)
+        })
+        it(`Calling tokenURI() on an existing tokenId 0 after reveal should return "${_initBaseURI}0.json"`, async () => {
+            await concavenft.unpause();
+            await getColorsMinter()
+            await mint(colorsOwnerSigner,1)
+            await concavenft.reveal();
+            expect(
+                await concavenft.tokenURI(0)
+            ).to.equal(`${_initBaseURI}0.json`)
+        })
+    })
 
     // it(``, async () => {})
 })
+
+
 
 // TODO:
 // withdraw()
