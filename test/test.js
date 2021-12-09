@@ -176,12 +176,12 @@ describe("ConcaveNFT", function () {
           const ctc = addresses[i]
           const b = await waffle.provider.getBalance(ctc)
           const c = b > previous[i] ? (b - previous[i]) : 0
-          console.log(names[i] || ctc,' : ',
-          ethers.utils.formatEther(
-              c > 0 ? c : '0'
-          )
-
-            )
+          // console.log(names[i] || ctc,' : ',
+          // ethers.utils.formatEther(
+          //     c > 0 ? c : '0'
+          // )
+          //
+          //   )
       }
   }).timeout(0);
 
@@ -257,12 +257,12 @@ describe("ConcaveNFT", function () {
           const ctc = addresses[i]
           const b = await waffle.provider.getBalance(ctc)
           const c = b > previous[i] ? (b - previous[i]) : 0
-          console.log(names[i] || ctc,' : ',
-          ethers.utils.formatEther(
-              c > 0 ? c : '0'
-          )
-
-            )
+          // console.log(names[i] || ctc,' : ',
+          // ethers.utils.formatEther(
+          //     c > 0 ? c : '0'
+          // )
+          //
+          //   )
       }
   }).timeout(0);
 

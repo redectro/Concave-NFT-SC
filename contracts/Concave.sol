@@ -19,6 +19,7 @@ contract ConcaveNFT is ERC721Enumerable, Pausable, Ownable {
     // Private
     // Counter for tokenIds
     Counters.Counter private _tokenIds;
+    bool internal _isPublicMintActive;
 
     // Public Variables
     string public baseURI; // Base URI for NFT post reveal
@@ -145,12 +146,15 @@ contract ConcaveNFT is ERC721Enumerable, Pausable, Ownable {
     function setPrice(uint256 _price) external onlyOwner {
         price = _price;
     }
+    function setPublicMintActive(bool _active) external onlyOwner {
+        _isPublicMintActive = _active;
+    }
 
     /**
      * Internal
      */
-    function _isPublicMintActiveInternal(uint256 _totalSupply) pure internal returns (bool) {
-        return _totalSupply >= TOTAL_COLORS_QUOTA || false;
+    function _isPublicMintActiveInternal(uint256 _totalSupply) view internal returns (bool) {
+        return _totalSupply >= TOTAL_COLORS_QUOTA || _isPublicMintActive;
     }
 
     /*
@@ -199,7 +203,7 @@ contract ConcaveNFT is ERC721Enumerable, Pausable, Ownable {
         if (!_isPublicMintActiveInternal(totalSupply())) {
             uint256 colors_balance = IERC721(THE_COLORS).balanceOf(msg.sender);
             require(colors_balance > 0,"Not Colors Owner");
-            uint256 quota = colors_balance*2;
+            uint256 quota = colors_balance * 2;
             require(hasMinted[msg.sender] <= quota,"Already minted your quota");
             require(hasMinted[msg.sender] + 1 <= quota,"Mint amount surpasses quota");
         }
