@@ -91,9 +91,6 @@ describe("ConcaveNFT: Reads public variables", () => {
 describe("ConcaveNFT: Owner functions", () => {
     beforeEach(deploy)
     describe("unpause()", () => {
-        it(`Contract is paused upon deployment`, async () => {
-            expect(await concavenft.paused()).to.equal(paused);
-        })
         it(`Third party calling unpause() should revert with "Ownable: caller is not the owner"`, async () => {
             await expect(
                 concavenft.connect(thirdParty).unpause()
@@ -130,5 +127,38 @@ describe("ConcaveNFT: Owner functions", () => {
         })
     })
 
+    describe("reveal()", () => {
+        it(`Third party calling reveal() should revert with "Ownable: caller is not the owner"`, async () => {
+            await expect(
+                concavenft.connect(thirdParty).reveal()
+            ).to.be.revertedWith('Ownable: caller is not the owner')
+        })
+        it(`Owner calling reveal() should pass"`, async () => {
+            await concavenft.reveal();
+        })
+        it(`Calling reveal() should make reveal=true`, async () => {
+            await concavenft.reveal();
+            expect(await concavenft.revealed()).to.equal(true);
+        })
+    })
+
+    describe("setNotRevealedURI()", () => {
+        it(`Third party calling setNotRevealedURI() should revert with "Ownable: caller is not the owner"`, async () => {
+            await expect(
+                concavenft.connect(thirdParty).setNotRevealedURI("")
+            ).to.be.revertedWith('Ownable: caller is not the owner')
+        })
+        it(`Owner calling reveal() should pass"`, async () => {
+            await concavenft.setNotRevealedURI("");
+        })
+        it(`Calling setNotRevealedURI() with parameter "test" should set notRevealedUri="test"`, async () => {
+            await concavenft.setNotRevealedURI("test");
+            expect(await concavenft.notRevealedUri()).to.equal("test");
+        })
+    })
+
     // it(``, async () => {})
 })
+
+// TODO:
+// withdraw()
