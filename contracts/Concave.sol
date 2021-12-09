@@ -205,7 +205,6 @@ contract ConcaveNFT is ERC721Enumerable, Pausable, Ownable {
             require(colors_balance > 0,"Not Colors Owner");
             uint256 quota = colors_balance * 2;
             require(hasMinted[msg.sender] <= quota,"Already minted your quota");
-            require(hasMinted[msg.sender] + 1 <= quota,"Mint amount surpasses quota");
         }
 
         uint256 newItemId = _tokenIds.current();
