@@ -171,8 +171,8 @@ contract ConcaveNFT is ERC721Enumerable, Pausable, Ownable {
       - the TheColors balance for the sender is obtained for the sender. If
         balance is 0, the function reverts. Thus preventing minting if sender
         does not have a TheColors balance in the first 200 mints.
-      - If balance is larger than 0, it sets the minting quote for the sender.
-        The quota is equal to the balance multiplied by 2.
+      - If balance is larger than 0, it sets the minting quota for the sender.
+        The quota is equal to the balance.
       - It then checks if the sender has already minted their quota. If so, the
         function reverts.
       - It then checks if minting the amount requested would surpass the quota.
@@ -203,8 +203,7 @@ contract ConcaveNFT is ERC721Enumerable, Pausable, Ownable {
         if (!_isPublicMintActiveInternal(totalSupply())) {
             uint256 colors_balance = IERC721(THE_COLORS).balanceOf(msg.sender);
             require(colors_balance > 0,"Not Colors Owner");
-            uint256 quota = colors_balance * 2;
-            require(hasMinted[msg.sender] <= quota,"Already minted your quota");
+            require(hasMinted[msg.sender] <= colors_balance,"Already minted your quota");
         }
 
         uint256 newItemId = _tokenIds.current();

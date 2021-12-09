@@ -276,7 +276,7 @@ describe("ConcaveNFT: Owner functions", () => {
             expect(await concavenft.isPublicMintActive()).to.equal(true);
         })
     })
-    */
+
     describe("tokenURI()", () => {
         it(`Calling tokenURI() on nonexistent tokenId should revert with "ERC721Metadata: URI query for nonexistent token"`, async () => {
             await expect(
@@ -301,7 +301,10 @@ describe("ConcaveNFT: Owner functions", () => {
             ).to.equal(`${_initBaseURI}0.json`)
         })
     })
-
+    */
+    describe("mint()", () => {
+        
+    })
     // it(``, async () => {})
 })
 
