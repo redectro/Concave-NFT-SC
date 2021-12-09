@@ -145,7 +145,7 @@ contract ConcaveNFT is ERC721Enumerable, Pausable, Ownable {
     /**
      * Internal
      */
-    function _isPublicMintActiveInternal(uint256 _totalSupply) internal view returns (bool) {
+    function _isPublicMintActiveInternal(uint256 _totalSupply) pure internal returns (bool) {
         return _totalSupply >= TOTAL_COLORS_QUOTA || false;
     }
 
