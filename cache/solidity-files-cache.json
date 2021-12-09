@@ -2,8 +2,8 @@
   "_format": "hh-sol-cache-2",
   "files": {
     "/Users/juanbernardotobar/dev/convexdao/Concave-NFT-SC/contracts/Concave.sol": {
-      "lastModificationDate": 1638921950231,
-      "contentHash": "72033f6d68ae933dd9c03bc343c2c48a",
+      "lastModificationDate": 1639058812612,
+      "contentHash": "eeb79b317b2098fb9b069621599e8fe9",
       "sourceName": "contracts/Concave.sol",
       "solcConfig": {
         "version": "0.8.4",
@@ -667,46 +667,6 @@
       ],
       "artifacts": [
         "TheSpirals"
-      ]
-    },
-    "/Users/juanbernardotobar/dev/convexdao/Concave-NFT-SC/contracts/ConcaveOLD.sol": {
-      "lastModificationDate": 1638810014388,
-      "contentHash": "acac675a56c1cc2468856f4aab3ef00e",
-      "sourceName": "contracts/ConcaveOLD.sol",
-      "solcConfig": {
-        "version": "0.8.4",
-        "settings": {
-          "optimizer": {
-            "enabled": false,
-            "runs": 200
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [
-        "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol",
-        "@openzeppelin/contracts/access/Ownable.sol",
-        "hardhat/console.sol",
-        "./colors/INFTOwner.sol"
-      ],
-      "versionPragmas": [
-        ">=0.7.0 <0.9.0"
-      ],
-      "artifacts": [
-        "ConcaveNFTOLD"
       ]
     },
     "/Users/juanbernardotobar/dev/convexdao/Concave-NFT-SC/node_modules/@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol": {
