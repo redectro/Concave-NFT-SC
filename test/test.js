@@ -27,6 +27,10 @@ describe("ConcaveNFT", function () {
       [deployer, thirdParty] = await ethers.getSigners();
     // Get the ContractFactory and Signers here.
     // console.log('before')
+
+    console.log(
+        await waffle.provider.getBalance(colorsOwner) - await waffle.provider.getBalance(colorsOwner)
+    )
     ConcaveNFT = await ethers.getContractFactory("ConcaveNFT");
     concavenft = await ConcaveNFT.deploy(
         _name,
@@ -128,14 +132,138 @@ describe("ConcaveNFT", function () {
 
       let minted = 200;
       while (minted < maxSupply) {
-          let amount = maxSupply - maxSupply > 10 ? 10 : maxSupply - maxSupply;
-          console.log(amount,minted)
+          let amount = maxSupply - minted > 10 ? 10 : maxSupply - minted;
+          // console.log(amount,minted)
           await concavenft.connect(thirdParty).mint(amount,{value:ethers.utils.parseEther('0.4')});
           minted+=amount
       }
 
       console.log(await concavenft.totalSupply())
       console.log('-----------------------------')
+
+      console.log(ethers.utils.formatEther(
+          await waffle.provider.getBalance(concavenft.address)
+      ))
+      const names = [
+          'NFT                                       ',
+          'Treasury                                  '
+      ]
+      const previous = []
+      const addresses = [
+          concavenft.address,
+          '0x48aE900E9Df45441B2001dB4dA92CE0E7C08c6d2',
+          '0x2F66d5D7561e1bE587968cd336FA3623E5792dc2',
+          '0xeb9ADe429FBA6c51a1B352a869417Bd410bC1421',
+          '0xf1A1e46463362C0751Af4Ff46037D1815d66bB4D',
+          '0x1E3005BD8281148f1b00bdcC94E8d0cD9DA242C2',
+          '0x21761978a6F93D0bF5bAb5F75762880E8dc813e8',
+          '0x5b3DBf9004E01509777329B762EC2332565F12fA',
+          '0xB2b9FF858Bf74436685DaaF76d6901C2A24ef0C3',
+          '0xe873Fa8436097Bcdfa593EEd60c10eFAd4244dC0',
+          '0x182e0C610c4A855b81169385821C4c8690Af5f3b'
+      ]
+      for (var i = 0; i < addresses.length; i++) {
+          const ctc = addresses[i]
+          const p  = await waffle.provider.getBalance(ctc)
+          previous.push(p)
+          console.log(names[i] || ctc,' : ', ethers.utils.formatEther(
+              p
+          ))
+      }
+
+      await concavenft.withdraw();
+      for (var i = 0; i < addresses.length; i++) {
+          const ctc = addresses[i]
+          const b = await waffle.provider.getBalance(ctc)
+          const c = b > previous[i] ? (b - previous[i]) : 0
+          console.log(names[i] || ctc,' : ',
+          ethers.utils.formatEther(
+              c > 0 ? c : '0'
+          )
+
+            )
+      }
+  }).timeout(0);
+
+
+  it("200 colors holders can mint", async () => {
+      await concavenft.unpause();
+
+      for (var i = 0; i < listColorsHolders.length; i++) {
+          let addy = listColorsHolders[i][0]
+          await hre.network.provider.request({
+            method: "hardhat_impersonateAccount",
+            params: [addy],
+          });
+          await network.provider.send("hardhat_setBalance", [
+            addy,
+            ethers.utils.parseEther('10.0').toHexString().replace("0x0", "0x"),
+          ]);
+          let addysigner = await ethers.provider.getSigner(addy);
+          let quota = listColorsHolders[i][1]*2
+          while (quota > 0) {
+              let amount = quota > 10 ? 10 : quota;
+              // console.log('minting',amount,listColorsHolders[i])
+              await concavenft.connect(addysigner).mint(amount);
+              quota-=amount
+          }
+      }
+
+
+      let minted = 200;
+      let sold = 1000;
+      while (minted < sold) {
+          let amount = sold - minted > 10 ? 10 : sold - minted;
+          // console.log(amount,minted)
+          await concavenft.connect(thirdParty).mint(amount,{value:ethers.utils.parseEther('0.4')});
+          minted+=amount
+      }
+
+      console.log(await concavenft.totalSupply())
+      console.log('-----------------------------')
+
+      // console.log(ethers.utils.formatEther(
+      //     await waffle.provider.getBalance(concavenft.address)
+      // ))
+      const names = [
+          'NFT                                       ',
+          'Treasury                                  '
+      ]
+      const previous = []
+      const addresses = [
+          concavenft.address,
+          '0x48aE900E9Df45441B2001dB4dA92CE0E7C08c6d2',
+          '0x2F66d5D7561e1bE587968cd336FA3623E5792dc2',
+          '0xeb9ADe429FBA6c51a1B352a869417Bd410bC1421',
+          '0xf1A1e46463362C0751Af4Ff46037D1815d66bB4D',
+          '0x1E3005BD8281148f1b00bdcC94E8d0cD9DA242C2',
+          '0x21761978a6F93D0bF5bAb5F75762880E8dc813e8',
+          '0x5b3DBf9004E01509777329B762EC2332565F12fA',
+          '0xB2b9FF858Bf74436685DaaF76d6901C2A24ef0C3',
+          '0xe873Fa8436097Bcdfa593EEd60c10eFAd4244dC0',
+          '0x182e0C610c4A855b81169385821C4c8690Af5f3b'
+      ]
+      for (var i = 0; i < addresses.length; i++) {
+          const ctc = addresses[i]
+          const p  = await waffle.provider.getBalance(ctc)
+          previous.push(p)
+          console.log(names[i] || ctc,' : ', ethers.utils.formatEther(
+              p
+          ))
+      }
+
+      await concavenft.withdraw();
+      for (var i = 0; i < addresses.length; i++) {
+          const ctc = addresses[i]
+          const b = await waffle.provider.getBalance(ctc)
+          const c = b > previous[i] ? (b - previous[i]) : 0
+          console.log(names[i] || ctc,' : ',
+          ethers.utils.formatEther(
+              c > 0 ? c : '0'
+          )
+
+            )
+      }
   }).timeout(0);
 
   // it("Impersonates Account", async () => {
