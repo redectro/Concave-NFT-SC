@@ -84,6 +84,9 @@ describe("ConcaveNFT: Reads public variables", () => {
     it(`owner is "${paused}"`, async () => {
         expect(await concavenft.owner()).to.equal(deployer.address)
     })
+    it(`isPublicMintActive is "${false}"`, async () => {
+        expect(await concavenft.isPublicMintActive()).to.equal(false)
+    })
 
     // it(``, async () => {})
 });
@@ -148,12 +151,115 @@ describe("ConcaveNFT: Owner functions", () => {
                 concavenft.connect(thirdParty).setNotRevealedURI("")
             ).to.be.revertedWith('Ownable: caller is not the owner')
         })
-        it(`Owner calling reveal() should pass"`, async () => {
+        it(`Owner calling setNotRevealedURI() should pass"`, async () => {
             await concavenft.setNotRevealedURI("");
         })
         it(`Calling setNotRevealedURI() with parameter "test" should set notRevealedUri="test"`, async () => {
             await concavenft.setNotRevealedURI("test");
             expect(await concavenft.notRevealedUri()).to.equal("test");
+        })
+        it(`Owner can call setNotRevealedURI multiple times`, async () => {
+            await concavenft.setNotRevealedURI("test");
+            expect(await concavenft.notRevealedUri()).to.equal("test");
+            await concavenft.setNotRevealedURI("test2");
+            expect(await concavenft.notRevealedUri()).to.equal("test2");
+            await concavenft.setNotRevealedURI("test3");
+            expect(await concavenft.notRevealedUri()).to.equal("test3");
+        })
+    })
+
+    describe("setBaseURI()", () => {
+        it(`Third party calling setBaseURI() should revert with "Ownable: caller is not the owner"`, async () => {
+            await expect(
+                concavenft.connect(thirdParty).setBaseURI("")
+            ).to.be.revertedWith('Ownable: caller is not the owner')
+        })
+        it(`Owner calling setBaseURI() should pass"`, async () => {
+            await concavenft.setBaseURI("");
+        })
+        it(`Calling setBaseURI() with parameter "test" should set baseURI="test"`, async () => {
+            await concavenft.setBaseURI("test");
+            expect(await concavenft.baseURI()).to.equal("test");
+        })
+        it(`Owner can call setBaseURI multiple times`, async () => {
+            await concavenft.setBaseURI("test");
+            expect(await concavenft.baseURI()).to.equal("test");
+            await concavenft.setBaseURI("test2");
+            expect(await concavenft.baseURI()).to.equal("test2");
+            await concavenft.setBaseURI("test3");
+            expect(await concavenft.baseURI()).to.equal("test3");
+        })
+    })
+
+
+    describe("setMaxMintAmount()", () => {
+        it(`Third party calling setMaxMintAmount() should revert with "Ownable: caller is not the owner"`, async () => {
+            await expect(
+                concavenft.connect(thirdParty).setMaxMintAmount(20)
+            ).to.be.revertedWith('Ownable: caller is not the owner')
+        })
+        it(`Owner calling setMaxMintAmount() should pass"`, async () => {
+            await concavenft.setMaxMintAmount(20);
+        })
+        it(`Calling setMaxMintAmount() with parameter "40" should set maxMintAmount="40"`, async () => {
+            await concavenft.setMaxMintAmount(40);
+            expect(await concavenft.maxMintAmount()).to.equal(40);
+        })
+        it(`Owner can call setMaxMintAmount multiple times`, async () => {
+            await concavenft.setMaxMintAmount(40);
+            expect(await concavenft.maxMintAmount()).to.equal(40);
+            await concavenft.setMaxMintAmount(50);
+            expect(await concavenft.maxMintAmount()).to.equal(50);
+            await concavenft.setMaxMintAmount(60);
+            expect(await concavenft.maxMintAmount()).to.equal(60);
+        })
+    })
+
+    describe("setPrice()", () => {
+        it(`Third party calling setPrice() should revert with "Ownable: caller is not the owner"`, async () => {
+            await expect(
+                concavenft.connect(thirdParty).setPrice(20)
+            ).to.be.revertedWith('Ownable: caller is not the owner')
+        })
+        it(`Owner calling setPrice() should pass"`, async () => {
+            await concavenft.setPrice(20);
+        })
+        it(`Calling setPrice() with parameter "40" should set maxMintAmount="40"`, async () => {
+            await concavenft.setPrice(40);
+            expect(await concavenft.price()).to.equal(40);
+        })
+        it(`Owner can call setPrice multiple times`, async () => {
+            await concavenft.setPrice(40);
+            expect(await concavenft.price()).to.equal(40);
+            await concavenft.setPrice(50);
+            expect(await concavenft.price()).to.equal(50);
+            await concavenft.setPrice(60);
+            expect(await concavenft.price()).to.equal(60);
+        })
+    })
+
+    describe("setPublicMintActive()", () => {
+        it(`Third party calling setPublicMintActive() should revert with "Ownable: caller is not the owner"`, async () => {
+            await expect(
+                concavenft.connect(thirdParty).setPublicMintActive(true)
+            ).to.be.revertedWith('Ownable: caller is not the owner')
+        })
+        it(`Owner calling setPublicMintActive() should pass"`, async () => {
+            await concavenft.setPublicMintActive(true);
+        })
+
+
+        it(`Calling setPublicMintActive() with parameter "true" should make isPublicMintActive return "true"`, async () => {
+            await concavenft.setPublicMintActive(true);
+            expect(await concavenft.isPublicMintActive()).to.equal(true);
+        })
+        it(`Owner can call setPublicMintActive multiple times`, async () => {
+            await concavenft.setPublicMintActive(true);
+            expect(await concavenft.isPublicMintActive()).to.equal(true);
+            await concavenft.setPublicMintActive(false);
+            expect(await concavenft.isPublicMintActive()).to.equal(false);
+            await concavenft.setPublicMintActive(true);
+            expect(await concavenft.isPublicMintActive()).to.equal(true);
         })
     })
 
