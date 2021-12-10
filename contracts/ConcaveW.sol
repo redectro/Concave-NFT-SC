@@ -72,14 +72,15 @@ contract ConcaveNFT is ERC721Enumerable, Pausable, Ownable {
      After passing those checks - it proceeds minting the number of mints
      requested.
      */
-    function mint(uint256 _mintAmount, uint256[] memory _tokenId) external payable whenNotPaused returns (uint256) {
+    function presaleMint(uint256 _mintAmount, uint256[] memory _tokenId) external payable whenNotPaused returns (uint256) {
         require(_mintAmount <= maxMintAmount,"Max mint 10 per tx");
         require(_mintAmount > 0,"Mint should be > 0");
+        require(_mintAmount == _tokenId.length, "number of tokenIds inputted must equal mint amount");
         if (_isPublicMintActiveInternal(totalSupply())) {
             require(msg.value >= price * _mintAmount, "insufficient funds");
         }
         for (uint i = 0; i < _mintAmount; i++) {
-            _mintOnce(_tokenId[i]);
+            _presaleMintOnce(_tokenId[i]);
         }
         return _mintAmount;
     }
@@ -196,7 +197,7 @@ contract ConcaveNFT is ERC721Enumerable, Pausable, Ownable {
      After state changes have occurred, it mints via _safeMint to the sender
      with the tokenId obtained in the previous step.
      */
-    function _mintOnce(uint256 tokenId)
+    function _presaleMintOnce(uint256 tokenId)
         internal
         returns (uint256)
     {
@@ -207,7 +208,7 @@ contract ConcaveNFT is ERC721Enumerable, Pausable, Ownable {
         if (!_isPublicMintActiveInternal(totalSupply())) {
             uint256 colors_balance = IERC721(THE_COLORS).balanceOf(msg.sender);
             require(colors_balance > 0,"Not Colors Owner");
-            require(INFTOwner(THE_COLORS).ownerOf(tokenId) == msg.sender, "not the owner!");
+            require(TheColors(THE_COLORS).ownerOf(tokenId) == msg.sender, "not the owner of this token!");
             require(hasMinted[tokenId] != true,"Already minted your quota");
         }
 
@@ -215,7 +216,6 @@ contract ConcaveNFT is ERC721Enumerable, Pausable, Ownable {
         _tokenIds.increment();
         hasMinted[tokenId] = true;
         _safeMint(msg.sender, newItemId);
-
         return 1;
     }
 }
