@@ -59,24 +59,57 @@ contract ConcaveNFT is ERC721Enumerable, Pausable, Ownable {
      The function first checks if the desired mint amount is whithin boundaries
      - i.e larger than 0 and less than the maxMintAmount.
 
+     It then checks whether minting would result in excess supply - and reverts
+     if it would.
+
      It then check whether the public mint is active - a check which gives true
-     if 200 or more mints have occurred, false otherwise.
+     if 200 or more mints have occurred or if public mint manually set, false
+     otherwise.
 
      If the public mint is active - the value in the message must be larger than
      or equal to the _mintAmount multiplied by the price.
 
+     If not public mint - the following checks occur:
+      - value in the message sent is zero (mint is free)
+      - sender has a THE_COLORS balance by calling balanceOf THE_COLORS
+      - reverts if THE_COLORS balance is zero
+      - reverts if sender has already minted their THE_COLORS balance
+      - Upong passing those checks it sets the _mintAmount for the sender via
+       hasMinted[msg.sender] = hasMinted[msg.sender] + _mintAmount
+
      After passing those checks - it proceeds minting the number of mints
-     requested.
+     requested which does the following:
+      - stores the current value of the tokenId Counter as newItemId
+      - increments the counter
+      - mints to the sender the newItemId via _safeMint
+
+     returns the _mintAmount
      */
     function mint(uint256 _mintAmount) external payable whenNotPaused returns (uint256) {
+
         require(_mintAmount <= maxMintAmount,"Max mint 10 per tx");
         require(_mintAmount > 0,"Mint should be > 0");
-        if (_isPublicMintActiveInternal(totalSupply())) {
+
+        uint256 _totalSupply = totalSupply();
+        require(_totalSupply + 1 <= MAX_SUPPLY, "not enough supply");
+
+
+        if (_isPublicMintActiveInternal(_totalSupply)) {
             require(msg.value >= price * _mintAmount, "insufficient funds");
+        } else {
+            require(msg.value == 0);
+            uint256 colors_balance = IERC721(THE_COLORS).balanceOf(msg.sender);
+            require(colors_balance > 0,"Not Colors Owner");
+            require(hasMinted[msg.sender] < colors_balance,"Already minted your quota");
+            hasMinted[msg.sender] = hasMinted[msg.sender] + _mintAmount;
         }
+
         for (uint i = 0; i < _mintAmount; i++) {
-            _mintOnce();
+            uint256 newItemId = _tokenIds.current();
+            _tokenIds.increment();
+            _safeMint(msg.sender, newItemId);
         }
+
         return _mintAmount;
     }
 
@@ -155,62 +188,5 @@ contract ConcaveNFT is ERC721Enumerable, Pausable, Ownable {
      */
     function _isPublicMintActiveInternal(uint256 _totalSupply) view internal returns (bool) {
         return _totalSupply >= TOTAL_COLORS_QUOTA || _isPublicMintActive;
-    }
-
-    /*
-     @notice: this internal function actually peforms the mint logic for a
-     single mint.
-
-     It first checks whether minting would surpass the MAX_SUPPLY, and if it
-     does - it reverts.
-
-     It then checks whether the public mint is active via the
-     _isPublicMintActiveInternal function. If the public mint is not active -
-     and thus the presale mint is active - the following checks occur:
-
-      - the TheColors balance for the sender is obtained for the sender. If
-        balance is 0, the function reverts. Thus preventing minting if sender
-        does not have a TheColors balance in the first 200 mints.
-      - If balance is larger than 0, it sets the minting quota for the sender.
-        The quota is equal to the balance.
-      - It then checks if the sender has already minted their quota. If so, the
-        function reverts.
-      - It then checks if minting the amount requested would surpass the quota.
-        If so, it reverts
-
-     After passing those checks it goes on to mint the token.
-
-     First the current tokenId is stored as a variable - it starts with tokenId
-     0.
-
-     It then increments the tokenId count.
-
-     It then stores in a mapping the number of mints from this sender (a mapping
-     used in the checks above to prevent sender with a certain TheColors balance
-     to mint more than quota).
-
-     After state changes have occurred, it mints via _safeMint to the sender
-     with the tokenId obtained in the previous step.
-     */
-    function _mintOnce()
-        internal
-        returns (uint256)
-    {
-        uint256 _totalSupply = totalSupply();
-        require(_totalSupply + 1 <= MAX_SUPPLY, "not enough supply");
-
-
-        if (!_isPublicMintActiveInternal(totalSupply())) {
-            uint256 colors_balance = IERC721(THE_COLORS).balanceOf(msg.sender);
-            require(colors_balance > 0,"Not Colors Owner");
-            require(hasMinted[msg.sender] <= colors_balance,"Already minted your quota");
-        }
-
-        uint256 newItemId = _tokenIds.current();
-        _tokenIds.increment();
-        hasMinted[msg.sender]++;
-        _safeMint(msg.sender, newItemId);
-
-        return 1;
     }
 }
