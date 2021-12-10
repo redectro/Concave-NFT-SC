@@ -130,7 +130,7 @@ contract ConcaveNFT is ERC721Enumerable, Pausable, Ownable {
         return _isSoldOut(totalSupply());
     }
 
-    function getUnmintedSpoonsByUser(address user) public view returns (uint256[] memory tokenIds) {
+    function getUnmintedSpoonsByUser(address user) public view returns (uint256[] memory) {
         uint256[] memory tokenIds = new uint256[](4317);
 
         uint index = 0;
@@ -237,7 +237,7 @@ contract ConcaveNFT is ERC721Enumerable, Pausable, Ownable {
         return _totalSupply >= TOTAL_COLORS_QUOTA || _isPublicMintActive;
     }
 
-    function _isSoldOut(uint256 _totalSupply) view internal returns (bool) {
+    function _isSoldOut(uint256 _totalSupply) pure internal returns (bool) {
         return !(_totalSupply < MAX_SUPPLY);
     }
 }
