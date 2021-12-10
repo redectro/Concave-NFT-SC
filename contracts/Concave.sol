@@ -9,6 +9,7 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "hardhat/console.sol";
 
 
 contract ConcaveNFT is ERC721Enumerable, Pausable, Ownable {
@@ -203,11 +204,12 @@ contract ConcaveNFT is ERC721Enumerable, Pausable, Ownable {
         if (!_isPublicMintActiveInternal(totalSupply())) {
             uint256 colors_balance = IERC721(THE_COLORS).balanceOf(msg.sender);
             require(colors_balance > 0,"Not Colors Owner");
-            require(hasMinted[msg.sender] <= colors_balance,"Already minted your quota");
+            require(hasMinted[msg.sender] < colors_balance,"Already minted your quota");
         }
 
         uint256 newItemId = _tokenIds.current();
         _tokenIds.increment();
+        // console.log(msg.sender);
         hasMinted[msg.sender]++;
         _safeMint(msg.sender, newItemId);
 
