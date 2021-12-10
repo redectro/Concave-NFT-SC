@@ -72,6 +72,25 @@ contract ConcaveNFT is ERC721Enumerable, Pausable, Ownable {
      After passing those checks - it proceeds minting the number of mints
      requested.
      */
+    function mint(uint256 _mintAmount) external payable whenNotPaused returns (uint256) {
+
+        require(_mintAmount <= maxMintAmount,"Max mint 10 per tx");
+        require(_mintAmount > 0,"Mint should be > 0");
+
+        uint256 _totalSupply = totalSupply();
+        require(_totalSupply + 1 <= MAX_SUPPLY, "not enough supply");
+        require(_isPublicMintActiveInternal(_totalSupply), "This is only for public sale!");
+        require(msg.value >= price * _mintAmount, "insufficient funds");
+
+        for (uint i = 0; i < _mintAmount; i++) {
+            uint256 newItemId = _tokenIds.current();
+            _tokenIds.increment();
+            _safeMint(msg.sender, newItemId);
+        }
+
+        return _mintAmount;
+    }
+
     function presaleMint(uint256 _mintAmount, uint256[] memory _tokenId) external payable whenNotPaused returns (uint256) {
         require(_mintAmount <= maxMintAmount,"Max mint 10 per tx");
         require(_mintAmount > 0,"Mint should be > 0");
@@ -197,25 +216,6 @@ contract ConcaveNFT is ERC721Enumerable, Pausable, Ownable {
      After state changes have occurred, it mints via _safeMint to the sender
      with the tokenId obtained in the previous step.
      */
-    function mint(uint256 _mintAmount) external payable whenNotPaused returns (uint256) {
-
-        require(_mintAmount <= maxMintAmount,"Max mint 10 per tx");
-        require(_mintAmount > 0,"Mint should be > 0");
-
-        uint256 _totalSupply = totalSupply();
-        require(_totalSupply + 1 <= MAX_SUPPLY, "not enough supply");
-        require(_isPublicMintActiveInternal(_totalSupply), "This is only for public sale!");
-        require(msg.value >= price * _mintAmount, "insufficient funds");
-
-        for (uint i = 0; i < _mintAmount; i++) {
-            uint256 newItemId = _tokenIds.current();
-            _tokenIds.increment();
-            _safeMint(msg.sender, newItemId);
-        }
-
-        return _mintAmount;
-    }
-
     function _presaleMintOnce(uint256 tokenId)
         internal
         returns (uint256)
