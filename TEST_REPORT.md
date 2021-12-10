@@ -1,3 +1,28 @@
+# Testing
+
+## Summary
+
+The only contract in this project is `ConcaveNFT` located on `./contracts/Concave.sol`.
+
+It inherits from the following \@openzeppelin contracts:
+ - `ERC721Enumerable`
+ - `Pausable`
+ - `Ownable`
+
+And uses the following libraries also from \@openzeppelin:
+ - `Strings` for `uint256`
+ - `Counters` for `Counters.Counter`
+
+## Testing
+
+The only contract tested was `ConcaveNFT` located on `./contracts/Concave.sol`.
+
+The tests performed are in `./tests`
+
+## Coverage
+
+The
+
 
 ```
 ☁  Concave-NFT-SC [main] ⚡  yarn test

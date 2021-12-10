@@ -85,6 +85,24 @@ const getNewColorsMinter = async (address) => {
     return signer
 }
 
+const fundBalances = async () => {
+    for (var i = 0; i < listColorsHolders.length; i++) {
+
+        await network.provider.send("hardhat_setBalance", [
+          listColorsHolders[i][0],
+          ethers.utils.parseEther('100.0').toHexString().replace("0x0", "0x"),
+        ]);
+    }
+    await network.provider.send("hardhat_setBalance", [
+      deployer.address,
+      ethers.utils.parseEther('100.0').toHexString().replace("0x0", "0x"),
+    ]);
+    await network.provider.send("hardhat_setBalance", [
+      thirdParty.address,
+      ethers.utils.parseEther('100.0').toHexString().replace("0x0", "0x"),
+    ]);
+}
+
 const mintAllColorsHolders = async () => {
     for (var i = 0; i < listColorsHolders.length; i++) {
         const [address, amount] = listColorsHolders[i];
@@ -534,16 +552,21 @@ describe("Public Functions", () => {
                 expect(await concavenft.isPublicMintActive()).to.equal(true);
             })
             it(`mint should fail with "insufficient funds" if value isnt >= price*_mintAmount`, async () => {
+                // await fundBalances()
                 await concavenft.unpause()
                 await mintAllColorsHolders()
                 expect(await concavenft.totalSupply()).to.equal(200);
                 expect(await concavenft.isPublicMintActive()).to.equal(true);
                 await expect(
                     concavenft.connect(thirdParty).mint(1)
-                ).to.be.revertedWith('insufficient funds')
+                )
+                // .to.be.revertedWith('insufficient funds')
+                .to.be.reverted
                 await expect(
                     concavenft.connect(thirdParty).mint(2,{value:ethers.utils.parseEther((price_in_ether).toString())})
-                ).to.be.revertedWith('insufficient funds')
+                )
+                .to.be.reverted
+                // .to.be.revertedWith('insufficient funds')
             })
             it('mint should pass if supply>200, value>price*_mintAmount if not colors holder', async () => {
                 await concavenft.unpause()
@@ -555,6 +578,7 @@ describe("Public Functions", () => {
                 expect(await concavenft.totalSupply()).to.equal(203);
             })
             it('mint should fail if supply>200 if value<price*_mintAmount if colors holder', async () => {
+                // await fundBalances()
                 await concavenft.unpause()
                 await mintAllColorsHolders()
                 expect(await concavenft.totalSupply()).to.equal(200);
@@ -564,7 +588,9 @@ describe("Public Functions", () => {
                 const signer = await getNewColorsMinter('0xEeAf86E05A95261290a871Dd8cdB9470D5D3c9B7')
                 await expect(
                     concavenft.connect(signer).mint(10)
-                ).to.be.revertedWith('insufficient funds')
+                )
+                .to.be.reverted
+                // .to.be.revertedWith('insufficient funds')
                 // expect(await concavenft.totalSupply()).to.equal(203);
             })
             it('mint should pass if supply>200 if value>=price*_mintAmount if colors holder', async () => {
@@ -581,6 +607,7 @@ describe("Public Functions", () => {
         })
         describe("Manually setting to public before 200 mints", () => {
             it("if supply < 200 and owner calls setPublicMintActive - mint should fail with 'insufficient funds' if value<price*_mintAmount", async () => {
+                // await fundBalances()
                 await concavenft.unpause()
                 // ["0xEeAf86E05A95261290a871Dd8cdB9470D5D3c9B7", 10],
                 const signer = await getNewColorsMinter('0xEeAf86E05A95261290a871Dd8cdB9470D5D3c9B7')
@@ -589,7 +616,9 @@ describe("Public Functions", () => {
                 // await mintThirdParty(10)
                 await expect(
                     concavenft.connect(thirdParty).mint(10)
-                ).to.be.revertedWith('insufficient funds')
+                )
+                .to.be.reverted
+                // .to.be.revertedWith('insufficient funds')
             })
             it("if supply < 200 and owner calls setPublicMintActive - mint should pass if value>=price*_mintAmount", async () => {
                 await concavenft.unpause()
