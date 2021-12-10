@@ -48,7 +48,7 @@ All files     |      100 |      100 |      100 |      100 |                |
 
 ## Test Details
 
-The following is the report of all tested statements. Of course the statements are useless unless the code used to test the statements is appropriate. All the tests can be found in `test/test.js`.
+The following is the report of all tested statements - a total of 65 tests. Of course the statements are useless unless the code used to test the statements is appropriate. All the tests can be found in `test/test.js`.
 
 In the below report, `>_` indicates that the contract was redeployed before the beginning of that test.
 
@@ -273,4 +273,26 @@ Below this table is a report of the mint function when minting only 1 - `mint(1)
 |  ConcaveNFT                          ·          -  ·           -  ·    4630855  ·       15.4 %  ·    1943.76  │
 ·--------------------------------------|-------------|--------------|-------------|---------------|-------------·
 
+```
+
+Minting only 1 - `mint(1)` - costs an average of `167,240` in gas:
+
+```
+·--------------------------------------|----------------------------|-------------|-----------------------------·
+|         Solc version: 0.8.4          ·  Optimizer enabled: false  ·  Runs: 200  ·  Block limit: 30000000 gas  │
+·······································|····························|·············|······························
+|  Methods                             ·               100 gwei/gas               ·       4162.64 usd/eth       │
+···············|·······················|·············|··············|·············|···············|··············
+|  Contract    ·  Method               ·  Min        ·  Max         ·  Avg        ·  # calls      ·  usd (avg)  │
+···············|·······················|·············|··············|·············|···············|··············
+|  ConcaveNFT  ·  mint                 ·     159911  ·     1234541  ·     167240  ·         5327  ·      69.62  │
+···············|·······················|·············|··············|·············|···············|··············
+|  ConcaveNFT  ·  setPublicMintActive  ·          -  ·           -  ·      46207  ·            2  ·      19.23  │
+···············|·······················|·············|··············|·············|···············|··············
+|  ConcaveNFT  ·  unpause              ·          -  ·           -  ·      28118  ·            8  ·      11.70  │
+···············|·······················|·············|··············|·············|···············|··············
+|  Deployments                         ·                                          ·  % of limit   ·             │
+·······································|·············|··············|·············|···············|··············
+|  ConcaveNFT                          ·          -  ·           -  ·    4630855  ·       15.4 %  ·    1927.66  │
+·--------------------------------------|-------------|--------------|-------------|---------------|-------------·
 ```
