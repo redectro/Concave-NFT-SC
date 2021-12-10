@@ -27,7 +27,7 @@ contract ConcaveNFT is ERC721Enumerable, Pausable, Ownable {
     uint256 public maxMintAmount = 10; // Max amount of mints per transaction
     uint256 public price = 0.04 ether; // Price per mint
     bool public revealed = false; // NFT URI has been revealed
-    mapping(address => uint256) public hasMinted; // Whether colors owner has minted
+    mapping(uint256 => bool) public hasClaimed; // Whether tokenId has been claimed
 
     // Public Constants
     address public constant THE_COLORS = 0x9fdb31F8CE3cB8400C7cCb2299492F2A498330a4;
@@ -49,68 +49,74 @@ contract ConcaveNFT is ERC721Enumerable, Pausable, Ownable {
     }
 
     /*
-     @notice: Minting is done uniquely through the mint function. Whether for
-     a single mint or multiple mints, whether for the initial colors holders or
-     for the public.
+     @notice: mint is for minting once the public sale is active. The parameter
+     _mintAmount indicates the number of tokens the user wishes to mint.
 
-     This function can only be called externally and when the contract is not
-     paused.
+     The following checks occur:
+      - first checks that the public mint is active, reverts otherwise
+      - then checks that whether collection sold out, reverts otherwise
+      - then checks whether _mintAmount is within boundaries: 0 < x <= 10
+      - then checks whether minting _mintAmount would exceed supply.
+      - finally checks where value > price*_mintAmount
 
-     The function first checks if the desired mint amount is whithin boundaries
-     - i.e larger than 0 and less than the maxMintAmount.
-
-     It then checks whether minting would result in excess supply - and reverts
-     if it would.
-
-     It then check whether the public mint is active - a check which gives true
-     if 200 or more mints have occurred or if public mint manually set, false
-     otherwise.
-
-     If the public mint is active - the value in the message must be larger than
-     or equal to the _mintAmount multiplied by the price.
-
-     If not public mint - the following checks occur:
-      - value in the message sent is zero (mint is free)
-      - sender has a THE_COLORS balance by calling balanceOf THE_COLORS
-      - reverts if THE_COLORS balance is zero
-      - reverts if sender has already minted their THE_COLORS balance
-      - Upong passing those checks it sets the _mintAmount for the sender via
-       hasMinted[msg.sender] = hasMinted[msg.sender] + _mintAmount
-
-     After passing those checks - it proceeds minting the number of mints
-     requested which does the following:
-      - stores the current value of the tokenId Counter as newItemId
-      - increments the counter
-      - mints to the sender the newItemId via _safeMint
+     Upon passing checks it calls  the internal _mintOnce function to perform
+     the minting.
 
      returns the _mintAmount
      */
     function mint(uint256 _mintAmount) external payable whenNotPaused returns (uint256) {
 
+        uint256 _totalSupply = totalSupply();
+        require(_isPublicMintActiveInternal(_totalSupply),"public sale not active");
+        require(!_isSoldOut(_totalSupply), "sold out");
         require(_mintAmount <= maxMintAmount,"Max mint 10 per tx");
         require(_mintAmount > 0,"Mint should be > 0");
-
-        uint256 _totalSupply = totalSupply();
-        require(_totalSupply + 1 <= MAX_SUPPLY, "not enough supply");
-
-
-        if (_isPublicMintActiveInternal(_totalSupply)) {
-            require(msg.value >= price * _mintAmount, "insufficient funds");
-        } else {
-            require(msg.value == 0);
-            uint256 colors_balance = IERC721(THE_COLORS).balanceOf(msg.sender);
-            require(colors_balance > 0,"Not Colors Owner");
-            require(hasMinted[msg.sender] < colors_balance,"Already minted your quota");
-            hasMinted[msg.sender] = hasMinted[msg.sender] + _mintAmount;
-        }
+        require(_totalSupply + _mintAmount <= MAX_SUPPLY, "exceeds supply");
+        require(msg.value >= price * _mintAmount, "insufficient funds");
 
         for (uint i = 0; i < _mintAmount; i++) {
-            uint256 newItemId = _tokenIds.current();
-            _tokenIds.increment();
-            _safeMint(msg.sender, newItemId);
+            _mintOnce();
         }
 
         return _mintAmount;
+    }
+
+    /*
+     @notice: mintBatch is for colors holders to mint a batch of their
+     specific tokens.
+
+     It first requires that the public mint not be active. Reverts otherwise.
+
+     It then makes sure the number of tokens in the array does not exceed
+     boundaries: 0 < tokenIds.length <= 10.
+
+     Then, it begins looping over the array of tokenIds sent and performs the
+     following checks:
+      - checks for the owner of the tokenId by calling THE_COLORS
+      - requires that the tokenID has not already been claimed
+      - requires that the owner of the tokenID is the msg.sender
+      - sets the token as claimed
+
+      After those checks it calls the _mintOnce internal function to perform
+      the mint.
+     */
+    function mintBatch(uint256[] memory tokenIds) external whenNotPaused returns (uint256)  {
+        uint256 _totalSupply = totalSupply();
+        require(!_isPublicMintActiveInternal(_totalSupply),"presale over");
+        require(tokenIds.length <= maxMintAmount,"Max mint 10 per tx");
+        require(tokenIds.length > 0,"Minting 0.");
+
+
+        for (uint256 i = 0; i < tokenIds.length; i++) {
+            uint256 tokenId = tokenIds[i];
+            address tokenOwner = IERC721(THE_COLORS).ownerOf(tokenId);
+            require(!hasClaimed[tokenId], "Color already claimed.");
+            require(msg.sender == tokenOwner, "Only owner can claim.");
+            hasClaimed[tokenId] = true;
+            _mintOnce();
+        }
+
+        return tokenIds.length;
     }
 
     /**
@@ -120,6 +126,31 @@ contract ConcaveNFT is ERC721Enumerable, Pausable, Ownable {
         return _isPublicMintActiveInternal(totalSupply());
     }
 
+    function isSoldOut() external view returns (bool) {
+        return _isSoldOut(totalSupply());
+    }
+
+    function getUnmintedSpoonsByUser(address user) public view returns (uint256[] memory tokenIds) {
+        uint256[] memory tokenIds = new uint256[](4317);
+
+        uint index = 0;
+        for (uint i = 0; i < 4317; i++) {
+            address tokenOwner = ERC721(THE_COLORS).ownerOf(i);
+
+            if (user == tokenOwner && !hasClaimed[i]) {
+                tokenIds[index] = i;
+                index += 1;
+            }
+        }
+
+        uint left = 4317 - index;
+        for (uint i = 0; i < left; i++) {
+            tokenIds[index] = 9999;
+            index += 1;
+        }
+
+        return tokenIds;
+    }
 
     function tokenURI(uint256 tokenId) public view virtual override returns (string memory) {
         require(_exists(tokenId), "ERC721Metadata: URI query for nonexistent token");
@@ -186,7 +217,27 @@ contract ConcaveNFT is ERC721Enumerable, Pausable, Ownable {
     /**
      * Internal
      */
+
+
+    /* @notice: the _mintOnce function is called by mintBatch and by mint to
+     perform the actual mint.
+
+     In other words - the mintBatch function performs the checks during presale
+     mint before calling this function to mint. And the mint function performs
+     checks during public mint before calling this function to mint.
+
+     */
+    function _mintOnce() internal {
+        uint256 newItemId = _tokenIds.current();
+        _tokenIds.increment();
+        _safeMint(msg.sender, newItemId);
+    }
+
     function _isPublicMintActiveInternal(uint256 _totalSupply) view internal returns (bool) {
         return _totalSupply >= TOTAL_COLORS_QUOTA || _isPublicMintActive;
+    }
+
+    function _isSoldOut(uint256 _totalSupply) view internal returns (bool) {
+        return !(_totalSupply < MAX_SUPPLY);
     }
 }
