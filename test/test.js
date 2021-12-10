@@ -503,6 +503,12 @@ describe("Public Functions", () => {
                     concavenft.connect(thirdParty).mint(11)
                 ).to.be.revertedWith('Max mint 10 per tx')
             })
+            it(`mint should fail with "Mint should be > 0" if minting 0`, async () => {
+                await concavenft.unpause()
+                await expect(
+                    concavenft.connect(thirdParty).mint(0)
+                ).to.be.revertedWith('Mint should be > 0')
+            })
             it(`succesfull sell out - 200 mints by holders and remaining by third party`, async () => {
                 await concavenft.unpause()
                 await mintAllColorsHolders()

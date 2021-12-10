@@ -17,11 +17,40 @@ And uses the following libraries also from \@openzeppelin:
 
 The only contract tested was `ConcaveNFT` located on `./contracts/Concave.sol`.
 
-The tests performed are in `./tests`
+The tests performed are in `./tests/test.js`.
+
+Testing was done with `npx hardhat test`.
+
+Coverage was done with `npx hardhat coverage` using [https://github.com/sc-forks/solidity-coverage](solidity-coverage).
+
+## Approach
+
+All methods, variables, and lines of code were testing from the point of view of how they should behave and how they shouldn't. The `mint()` function is the only `public` non-`view` function not protected by `onlyOwner` - so a particular effort was made in devising as many scenarios as possible to test this function.
 
 ## Coverage
 
-The
+100% of Statements, branches, functions, and lines were covered. More detailed information can be found by cloning this repo and opening `coverage/index.html` on a browser.
+
+```
+66 passing (3m)
+
+--------------|----------|----------|----------|----------|----------------|
+File          |  % Stmts | % Branch |  % Funcs |  % Lines |Uncovered Lines |
+--------------|----------|----------|----------|----------|----------------|
+contracts/    |      100 |      100 |      100 |      100 |                |
+Concave.sol   |      100 |      100 |      100 |      100 |                |
+--------------|----------|----------|----------|----------|----------------|
+All files     |      100 |      100 |      100 |      100 |                |
+--------------|----------|----------|----------|----------|----------------|
+
+> Istanbul reports written to ./coverage/ and ./coverage.json
+```
+
+## Test Details
+
+The following is the report of all tested statements. Of course the statements are useless unless the code used to test the statements is appropriate. All the tests can be found in `test/test.js`.
+
+In the below report, `>_` indicates that the contract was redeployed before the beginning of that test.
 
 
 ```
@@ -198,6 +227,20 @@ Treasury                                   + 98.808 (60 %)
 >_
         ✓ if supply < 200 and owner calls setPublicMintActive - mint should pass if value>=price*_mintAmount
 
+
+  65 passing (2m)
+
+✨  Done in 126.35s.
+☁  Concave-NFT-SC [main] ⚡
+```
+
+## Gas Usage
+
+The following report is of the gas usage during all the functions. Particularly notable is the `mint()` function costing an average of `1,193,097` gas in 1938 runs. The majority of the `mint()` calls in this test were calls to mint the maximum number of tokens - 10 - `mint(10)`.
+
+Below this table is a report of the mint function when minting only 1 - `mint(1)`.
+
+```
 ·--------------------------------------|----------------------------|-------------|-----------------------------·
 |         Solc version: 0.8.4          ·  Optimizer enabled: false  ·  Runs: 200  ·  Block limit: 30000000 gas  │
 ·······································|····························|·············|······························
@@ -230,8 +273,4 @@ Treasury                                   + 98.808 (60 %)
 |  ConcaveNFT                          ·          -  ·           -  ·    4630855  ·       15.4 %  ·    1943.76  │
 ·--------------------------------------|-------------|--------------|-------------|---------------|-------------·
 
-  65 passing (2m)
-
-✨  Done in 126.35s.
-☁  Concave-NFT-SC [main] ⚡
 ```
