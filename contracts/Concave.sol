@@ -194,7 +194,6 @@ contract ConcaveNFT is ERC721Enumerable, Pausable, Ownable {
      */
     function _mintOnce()
         internal
-        returns (uint256)
     {
         uint256 _totalSupply = totalSupply();
         require(_totalSupply + 1 <= MAX_SUPPLY, "not enough supply");
@@ -210,7 +209,5 @@ contract ConcaveNFT is ERC721Enumerable, Pausable, Ownable {
         _tokenIds.increment();
         hasMinted[msg.sender]++;
         _safeMint(msg.sender, newItemId);
-
-        return 1;
     }
 }
