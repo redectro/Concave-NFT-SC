@@ -564,21 +564,40 @@ describe("Public Functions", () => {
     //     })
     // })
     describe('mintColorsBatch()', () => {
-        describe("whenNotPaused",() => {
-            it(`mintColorsBatch should fail with "Pausable: paused" if minting when paused`, async () => {
+        // describe("whenNotPaused",() => {
+        //     it(`mintColorsBatch should fail with "Pausable: paused" if minting when paused`, async () => {
+        //         await getColorsMinter()
+        //         let tokenlist = ['0','1','2','3','4','2620']
+        //         await expect(
+        //             concavenft.connect(colorsOwnerSigner).mintColorsBatch(tokenlist)
+        //         ).to.be.revertedWith('Pausable: paused')
+        //     })
+        //     it(`mintColorsBatch should not fail with "Pausable: paused" if minting when not paused`, async () => {
+        //         await concavenft.unpause()
+        //         await getColorsMinter()
+        //         let tokenlist = ['0','1','2','3','4','2620']
+        //         await expect(
+        //             concavenft.connect(colorsOwnerSigner).mintColorsBatch(tokenlist)
+        //         ).to.not.be.revertedWith('Pausable: paused')
+        //     })
+        // })
+        describe("presale check",() => {
+            it(`mintColorsBatch should fail with "presale over" if public sale not active yet`, async () => {
+                await concavenft.unpause()
+                await concavenft.setPublicMintActive(true);
                 await getColorsMinter()
                 let tokenlist = ['0','1','2','3','4','2620']
                 await expect(
                     concavenft.connect(colorsOwnerSigner).mintColorsBatch(tokenlist)
-                ).to.be.revertedWith('Pausable: paused')
+                ).to.be.revertedWith('presale over')
             })
-            it(`mintMany should not fail with "Pausable: paused" if minting when not paused`, async () => {
+            it(`mint should not fail with "presale over" if public sale is active `, async () => {
                 await concavenft.unpause()
                 await getColorsMinter()
                 let tokenlist = ['0','1','2','3','4','2620']
                 await expect(
                     concavenft.connect(colorsOwnerSigner).mintColorsBatch(tokenlist)
-                ).to.not.be.revertedWith('Pausable: paused')
+                ).to.not.be.revertedWith('presale over')
             })
         })
     })
