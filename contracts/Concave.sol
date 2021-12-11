@@ -30,7 +30,7 @@ contract ConcaveNFT is ERC721Enumerable, Pausable, Ownable {
     mapping(uint256 => bool) public hasClaimed; // Whether tokenId has been claimed
 
     // Public Constants
-    address public constant THE_COLORS = 0x9fdb31F8CE3cB8400C7cCb2299492F2A498330a4;
+    ERC721Enumerable public constant THE_COLORS = ERC721Enumerable(0x9fdb31F8CE3cB8400C7cCb2299492F2A498330a4);
     address public constant TREASURY = 0x48aE900E9Df45441B2001dB4dA92CE0E7C08c6d2;
     uint256 public constant MAX_SUPPLY = 4317;
     uint256 public constant TOTAL_COLORS_QUOTA = 200;
