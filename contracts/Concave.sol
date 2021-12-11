@@ -188,27 +188,21 @@ contract ConcaveNFT is ERC721Enumerable, Pausable, Ownable {
     function getUnmintedSpoonsByUser(address user)
         public
         view
-        returns (uint256[] memory)
+        returns (uint256[] memory, uint256) 
     {
-        uint256[] memory tokenIds = new uint256[](4317);
+        uint balance = THE_COLORS.balanceOf(user);
+        uint256[] memory tokenIds = new uint256[](balance);
 
         uint index = 0;
-        for (uint i = 0; i < 4317; i++) {
-            address tokenOwner = ERC721(THE_COLORS).ownerOf(i);
-
-            if (user == tokenOwner && !hasClaimed[i]) {
-                tokenIds[index] = i;
+        for (uint i = 0; i < balance; i++) {
+            uint tokenID = THE_COLORS.tokenOfOwnerByIndex(user, i);
+            if(!hasClaimed[tokenID]) {
+                tokenIds[i] = tokenID;
                 index += 1;
             }
         }
 
-        uint left = 4317 - index;
-        for (uint i = 0; i < left; i++) {
-            tokenIds[index] = 9999;
-            index += 1;
-        }
-
-        return tokenIds;
+        return (tokenIds, index);
     }
 
     function tokenURI(uint256 tokenId)
