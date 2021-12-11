@@ -113,7 +113,7 @@ const mintAllColorsHolders = async () => {
 /**
  TESTS
  */
-/*
+
 describe("ConcaveNFT: Reads public constants", () => {
     before(deploy)
     it(`THE_COLORS is "${THE_COLORS}"`, async () => {
@@ -472,115 +472,115 @@ describe("ConcaveNFT: Owner functions", () => {
 
     // it(``, async () => {})
 })
-*/
+
 describe("Public Functions", () => {
     beforeEach(deploy)
-    // describe('mint()', () => {
-    //     describe("whenNotPaused",() => {
-    //         it(`mint should fail with "Pausable: paused" if minting when paused`, async () => {
-    //             await expect(
-    //                 concavenft.connect(thirdParty).mint()
-    //             ).to.be.revertedWith('Pausable: paused')
-    //         })
-    //         it(`mint should not fail with "Pausable: paused" if minting when not paused`, async () => {
-    //             await concavenft.unpause()
-    //             await expect(
-    //                 concavenft.connect(thirdParty).mint()
-    //             ).to.not.be.revertedWith('Pausable: paused')
-    //         })
-    //     })
-    //     describe("public sale active check",() => {
-    //         it(`mint should fail with "public sale not active" if public sale not active yet`, async () => {
-    //             await concavenft.unpause()
-    //             await expect(
-    //                 concavenft.connect(thirdParty).mint()
-    //             ).to.be.revertedWith('public sale not active')
-    //         })
-    //         it(`mint should not fail with "public sale not active" if public sale is active `, async () => {
-    //             await concavenft.unpause()
-    //             await concavenft.setPublicMintActive(true)
-    //             // expect(await concavenft.totalSupply()).to.equal(200);
-    //             await expect(
-    //                 concavenft.connect(thirdParty).mint()
-    //             ).to.not.be.revertedWith('public sale not active')
-    //         })
-    //     })
-    //     describe("sold out check",() => {
-    //         it(`mint should fail with "sold out" if isSoldOut=true`, async () => {
-    //             await concavenft.unpause()
-    //             await mintAllColorsHolders()
-    //             expect(await concavenft.totalSupply()).to.equal(200);
-    //             await mintThirdParty(MAX_SUPPLY - 200)
-    //             expect(await concavenft.totalSupply()).to.equal(MAX_SUPPLY);
-    //             expect(await concavenft.isSoldOut()).to.equal(true);
-    //             await expect(
-    //                 concavenft.connect(thirdParty).mint()
-    //             ).to.be.revertedWith('sold out')
-    //         }).timeout(0)
-    //         it(`mint should not fail with "sold out" if isSoldOut=false`, async () => {
-    //             await concavenft.unpause()
-    //             await concavenft.setPublicMintActive(true)
-    //             // expect(await concavenft.totalSupply()).to.equal(200);
-    //             // await mintThirdParty(MAX_SUPPLY - 200)
-    //             // expect(await concavenft.totalSupply()).to.equal(MAX_SUPPLY);
-    //             expect(await concavenft.isSoldOut()).to.equal(false);
-    //             await expect(
-    //                 concavenft.connect(thirdParty).mint()
-    //             ).to.not.be.revertedWith('sold out')
-    //         }).timeout(0)
-    //     })
-    //     describe("insufficent funds check",() => {
-    //         it(`mint should fail with "insufficient funds" if msg.value < price`, async () => {
-    //             await concavenft.unpause()
-    //             await mintAllColorsHolders()
-    //             expect(await concavenft.totalSupply()).to.equal(200);
-    //             // await mintThirdParty(MAX_SUPPLY - 200)
-    //             // expect(await concavenft.totalSupply()).to.equal(MAX_SUPPLY);
-    //             // expect(await concavenft.isSoldOut()).to.equal(true);
-    //             await expect(
-    //                 concavenft.connect(thirdParty).mint()
-    //             ).to.be.revertedWith('insufficient funds')
-    //         }).timeout(0)
-    //         it(`mint should pass if msg.value >= price`, async () => {
-    //             await concavenft.unpause()
-    //             await concavenft.setPublicMintActive(true)
-    //             // expect(await concavenft.totalSupply()).to.equal(200);
-    //             // await mintThirdParty(MAX_SUPPLY - 200)
-    //             // expect(await concavenft.totalSupply()).to.equal(MAX_SUPPLY);
-    //             // expect(await concavenft.isSoldOut()).to.equal(true);
-    //             await expect(
-    //                 concavenft.connect(thirdParty).mint({value:ethers.utils.parseEther((price_in_ether).toString())})
-    //             ).to.not.be.reverted
-    //         }).timeout(0)
-    //     })
-    //     describe("counting",() => {
-    //         it(`totalSupply should increase by 1 after mint()`, async () => {
-    //             await concavenft.unpause()
-    //             await concavenft.setPublicMintActive(true)
-    //             expect(await concavenft.totalSupply()).to.equal(0);
-    //             await concavenft.connect(thirdParty).mint({value:ethers.utils.parseEther((price_in_ether).toString())})
-    //             expect(await concavenft.totalSupply()).to.equal(1);
-    //         }).timeout(0)
-    //     })
-    // })
+    describe('mint()', () => {
+        describe("whenNotPaused",() => {
+            it(`mint should fail with "Pausable: paused" if minting when paused`, async () => {
+                await expect(
+                    concavenft.connect(thirdParty).mint()
+                ).to.be.revertedWith('Pausable: paused')
+            })
+            it(`mint should not fail with "Pausable: paused" if minting when not paused`, async () => {
+                await concavenft.unpause()
+                await expect(
+                    concavenft.connect(thirdParty).mint()
+                ).to.not.be.revertedWith('Pausable: paused')
+            })
+        })
+        describe("public sale active check",() => {
+            it(`mint should fail with "public sale not active" if public sale not active yet`, async () => {
+                await concavenft.unpause()
+                await expect(
+                    concavenft.connect(thirdParty).mint()
+                ).to.be.revertedWith('public sale not active')
+            })
+            it(`mint should not fail with "public sale not active" if public sale is active `, async () => {
+                await concavenft.unpause()
+                await concavenft.setPublicMintActive(true)
+                // expect(await concavenft.totalSupply()).to.equal(200);
+                await expect(
+                    concavenft.connect(thirdParty).mint()
+                ).to.not.be.revertedWith('public sale not active')
+            })
+        })
+        describe("sold out check",() => {
+            it(`mint should fail with "sold out" if isSoldOut=true`, async () => {
+                await concavenft.unpause()
+                await mintAllColorsHolders()
+                expect(await concavenft.totalSupply()).to.equal(200);
+                await mintThirdParty(MAX_SUPPLY - 200)
+                expect(await concavenft.totalSupply()).to.equal(MAX_SUPPLY);
+                expect(await concavenft.isSoldOut()).to.equal(true);
+                await expect(
+                    concavenft.connect(thirdParty).mint()
+                ).to.be.revertedWith('sold out')
+            }).timeout(0)
+            it(`mint should not fail with "sold out" if isSoldOut=false`, async () => {
+                await concavenft.unpause()
+                await concavenft.setPublicMintActive(true)
+                // expect(await concavenft.totalSupply()).to.equal(200);
+                // await mintThirdParty(MAX_SUPPLY - 200)
+                // expect(await concavenft.totalSupply()).to.equal(MAX_SUPPLY);
+                expect(await concavenft.isSoldOut()).to.equal(false);
+                await expect(
+                    concavenft.connect(thirdParty).mint()
+                ).to.not.be.revertedWith('sold out')
+            }).timeout(0)
+        })
+        describe("insufficent funds check",() => {
+            it(`mint should fail with "insufficient funds" if msg.value < price`, async () => {
+                await concavenft.unpause()
+                await mintAllColorsHolders()
+                expect(await concavenft.totalSupply()).to.equal(200);
+                // await mintThirdParty(MAX_SUPPLY - 200)
+                // expect(await concavenft.totalSupply()).to.equal(MAX_SUPPLY);
+                // expect(await concavenft.isSoldOut()).to.equal(true);
+                await expect(
+                    concavenft.connect(thirdParty).mint()
+                ).to.be.revertedWith('insufficient funds')
+            }).timeout(0)
+            it(`mint should pass if msg.value >= price`, async () => {
+                await concavenft.unpause()
+                await concavenft.setPublicMintActive(true)
+                // expect(await concavenft.totalSupply()).to.equal(200);
+                // await mintThirdParty(MAX_SUPPLY - 200)
+                // expect(await concavenft.totalSupply()).to.equal(MAX_SUPPLY);
+                // expect(await concavenft.isSoldOut()).to.equal(true);
+                await expect(
+                    concavenft.connect(thirdParty).mint({value:ethers.utils.parseEther((price_in_ether).toString())})
+                ).to.not.be.reverted
+            }).timeout(0)
+        })
+        describe("counting",() => {
+            it(`totalSupply should increase by 1 after mint()`, async () => {
+                await concavenft.unpause()
+                await concavenft.setPublicMintActive(true)
+                expect(await concavenft.totalSupply()).to.equal(0);
+                await concavenft.connect(thirdParty).mint({value:ethers.utils.parseEther((price_in_ether).toString())})
+                expect(await concavenft.totalSupply()).to.equal(1);
+            }).timeout(0)
+        })
+    })
     describe('mintColorsBatch()', () => {
-        // describe("whenNotPaused",() => {
-        //     it(`mintColorsBatch should fail with "Pausable: paused" if minting when paused`, async () => {
-        //         await getColorsMinter()
-        //         let tokenlist = ['0','1','2','3','4','2620']
-        //         await expect(
-        //             concavenft.connect(colorsOwnerSigner).mintColorsBatch(tokenlist)
-        //         ).to.be.revertedWith('Pausable: paused')
-        //     })
-        //     it(`mintColorsBatch should not fail with "Pausable: paused" if minting when not paused`, async () => {
-        //         await concavenft.unpause()
-        //         await getColorsMinter()
-        //         let tokenlist = ['0','1','2','3','4','2620']
-        //         await expect(
-        //             concavenft.connect(colorsOwnerSigner).mintColorsBatch(tokenlist)
-        //         ).to.not.be.revertedWith('Pausable: paused')
-        //     })
-        // })
+        describe("whenNotPaused",() => {
+            it(`mintColorsBatch should fail with "Pausable: paused" if minting when paused`, async () => {
+                await getColorsMinter()
+                let tokenlist = ['0','1','2','3','4','2620']
+                await expect(
+                    concavenft.connect(colorsOwnerSigner).mintColorsBatch(tokenlist)
+                ).to.be.revertedWith('Pausable: paused')
+            })
+            it(`mintColorsBatch should not fail with "Pausable: paused" if minting when not paused`, async () => {
+                await concavenft.unpause()
+                await getColorsMinter()
+                let tokenlist = ['0','1','2','3','4','2620']
+                await expect(
+                    concavenft.connect(colorsOwnerSigner).mintColorsBatch(tokenlist)
+                ).to.not.be.revertedWith('Pausable: paused')
+            })
+        })
         describe("presale check",() => {
             it(`mintColorsBatch should fail with "presale over" if public sale not active yet`, async () => {
                 await concavenft.unpause()
@@ -591,7 +591,7 @@ describe("Public Functions", () => {
                     concavenft.connect(colorsOwnerSigner).mintColorsBatch(tokenlist)
                 ).to.be.revertedWith('presale over')
             })
-            it(`mint should not fail with "presale over" if public sale is active `, async () => {
+            it(`mintColorsBatch should not fail with "presale over" if public sale is active `, async () => {
                 await concavenft.unpause()
                 await getColorsMinter()
                 let tokenlist = ['0','1','2','3','4','2620']
@@ -600,8 +600,146 @@ describe("Public Functions", () => {
                 ).to.not.be.revertedWith('presale over')
             })
         })
+        describe("max mint 10 check, min mint 0 check",() => {
+            it(`mintColorsBatch should fail with "Max mint 10 per tx" if mintColorsBatch(>10)`, async () => {
+                await concavenft.unpause()
+                await getColorsMinter()
+                let tokenlist = ['0','1','2','3','4','2620','6','7','8','9','7','8']
+                await expect(
+                    concavenft.connect(colorsOwnerSigner).mintColorsBatch(tokenlist)
+                ).to.be.revertedWith('Max mint 10 per tx')
+            }).timeout(0)
+            it(`mintColorsBatch should not fail with "Max mint 10 per tx" if mintColorsBatch(<10)`, async () => {
+                await concavenft.unpause()
+                await getColorsMinter()
+                let tokenlist = ['0','1','2','3','4','2620']
+                await expect(
+                    concavenft.connect(colorsOwnerSigner).mintColorsBatch(tokenlist)
+                ).to.not.be.revertedWith('Max mint 10 per tx')
+            }).timeout(0)
+            it(`mintColorsBatch should fail with "Mint should be > 0" if mintColorsBatch(0)`, async () => {
+                await concavenft.unpause()
+                await getColorsMinter()
+                let tokenlist = []
+                await expect(
+                    concavenft.connect(colorsOwnerSigner).mintColorsBatch(tokenlist)
+                ).to.be.revertedWith('Mint should be > 0')
+            }).timeout(0)
+            it(`mintColorsBatch should not fail with "Mint should be > 0" if mintColorsBatch(>0)`, async () => {
+                await concavenft.unpause()
+                await getColorsMinter()
+                let tokenlist = ['0']
+                await expect(
+                    concavenft.connect(colorsOwnerSigner).mintColorsBatch(tokenlist)
+                ).to.not.be.revertedWith('Mint should be > 0')
+            }).timeout(0)
+        })
+        describe('claimed token check',() => {
+            it('shoud fail not fail with "Color already claimed." if tokenId not claimed',async () => {
+                await concavenft.unpause()
+                await getColorsMinter()
+                let tokenlist = ['0']
+                await expect(
+                    concavenft.connect(colorsOwnerSigner).mintColorsBatch(tokenlist)
+                ).to.not.be.reverted
+            })
+            it('shoud fail with "Color already claimed." if tokenId already claimed',async () => {
+                await concavenft.unpause()
+                await getColorsMinter()
+                let tokenlist = ['0']
+                await concavenft.connect(colorsOwnerSigner).mintColorsBatch(tokenlist)
+                await expect(
+                    concavenft.connect(colorsOwnerSigner).mintColorsBatch(tokenlist)
+                ).to.be.revertedWith('Color already claimed.')
+            })
+        })
+        describe('owner of token check',() => {
+            it('shoud fail not fail with "Only owner can claim." if owner is sender',async () => {
+                await concavenft.unpause()
+                await getColorsMinter()
+                let tokenlist = ['0']
+                await expect(
+                    concavenft.connect(colorsOwnerSigner).mintColorsBatch(tokenlist)
+                ).to.not.be.reverted
+            })
+            it('shoud fail with "Only owner can claim." if owner is not sender',async () => {
+                await concavenft.unpause()
+                await getColorsMinter()
+                let tokenlist = ['10']
+                await expect(
+                    concavenft.connect(colorsOwnerSigner).mintColorsBatch(tokenlist)
+                ).to.be.revertedWith('Only owner can claim.')
+            })
+        })
     })
-    /*
+    describe('mintColorsOnce()', () => {
+        describe("whenNotPaused",() => {
+            it(`mintColorsOnce should fail with "Pausable: paused" if minting when paused`, async () => {
+                await getColorsMinter()
+                await expect(
+                    concavenft.connect(colorsOwnerSigner).mintColorsOnce(0)
+                ).to.be.revertedWith('Pausable: paused')
+            })
+            it(`mintColorsBatch should not fail with "Pausable: paused" if minting when not paused`, async () => {
+                await concavenft.unpause()
+                await getColorsMinter()
+                await expect(
+                    concavenft.connect(colorsOwnerSigner).mintColorsOnce(0)
+                ).to.not.be.revertedWith('Pausable: paused')
+            })
+        })
+        describe("presale check",() => {
+            it(`mintColorsOnce should fail with "presale over" if public sale not active yet`, async () => {
+                await concavenft.unpause()
+                await concavenft.setPublicMintActive(true);
+                await getColorsMinter()
+                await expect(
+                    concavenft.connect(colorsOwnerSigner).mintColorsOnce(0)
+                ).to.be.revertedWith('presale over')
+            })
+            it(`mintColorsBatch should not fail with "presale over" if public sale is active `, async () => {
+                await concavenft.unpause()
+                await getColorsMinter()
+                await expect(
+                    concavenft.connect(colorsOwnerSigner).mintColorsOnce(0)
+                ).to.not.be.revertedWith('presale over')
+            })
+        })
+        describe('claimed token check',() => {
+            it('shoud fail not fail with "Color already claimed." if tokenId not claimed',async () => {
+                await concavenft.unpause()
+                await getColorsMinter()
+                await expect(
+                    concavenft.connect(colorsOwnerSigner).mintColorsOnce(0)
+                ).to.not.be.reverted
+            })
+            it('shoud fail with "Color already claimed." if tokenId already claimed',async () => {
+                await concavenft.unpause()
+                await getColorsMinter()
+                await concavenft.connect(colorsOwnerSigner).mintColorsOnce(0)
+                await expect(
+                    concavenft.connect(colorsOwnerSigner).mintColorsOnce(0)
+                ).to.be.revertedWith('Color already claimed.')
+            })
+        })
+        describe('owner of token check',() => {
+            it('shoud fail not fail with "Only owner can claim." if owner is sender',async () => {
+                await concavenft.unpause()
+                await getColorsMinter()
+                await expect(
+                    concavenft.connect(colorsOwnerSigner).mintColorsOnce(0)
+                ).to.not.be.reverted
+            })
+            it('shoud fail with "Only owner can claim." if owner is not sender',async () => {
+                await concavenft.unpause()
+                await getColorsMinter()
+                await expect(
+                    concavenft.connect(colorsOwnerSigner).mintColorsOnce(20)
+                ).to.be.revertedWith('Only owner can claim.')
+            })
+        })
+    })
+
     describe('mintMany()', () => {
         describe("whenNotPaused",() => {
             it(`mintMany should fail with "Pausable: paused" if minting when paused`, async () => {
@@ -617,13 +755,13 @@ describe("Public Functions", () => {
             })
         })
         describe("public sale active check",() => {
-            it(`mint should fail with "public sale not active" if public sale not active yet`, async () => {
+            it(`mintMany should fail with "public sale not active" if public sale not active yet`, async () => {
                 await concavenft.unpause()
                 await expect(
                     concavenft.connect(thirdParty).mintMany(2)
                 ).to.be.revertedWith('public sale not active')
             })
-            it(`mint should not fail with "public sale not active" if public sale is active `, async () => {
+            it(`mintMany should not fail with "public sale not active" if public sale is active `, async () => {
                 await concavenft.unpause()
                 await concavenft.setPublicMintActive(true)
                 // expect(await concavenft.totalSupply()).to.equal(200);
@@ -644,7 +782,7 @@ describe("Public Functions", () => {
                     concavenft.connect(thirdParty).mintMany(2)
                 ).to.be.revertedWith('sold out')
             }).timeout(0)
-            it(`mint should not fail with "sold out" if isSoldOut=false`, async () => {
+            it(`mintMany should not fail with "sold out" if isSoldOut=false`, async () => {
                 await concavenft.unpause()
                 await concavenft.setPublicMintActive(true)
                 // expect(await concavenft.totalSupply()).to.equal(200);
@@ -657,7 +795,7 @@ describe("Public Functions", () => {
             }).timeout(0)
         })
         describe("max mint 10 check, min mint 0 check",() => {
-            it(`mint should fail with "Max mint 10 per tx" if mintMany(>10)`, async () => {
+            it(`mintMany should fail with "Max mint 10 per tx" if mintMany(>10)`, async () => {
                 await concavenft.unpause()
                 await concavenft.setPublicMintActive(true)
                 // expect(await concavenft.totalSupply()).to.equal(200);
@@ -668,7 +806,7 @@ describe("Public Functions", () => {
                     concavenft.connect(thirdParty).mintMany(11)
                 ).to.be.revertedWith('Max mint 10 per tx')
             }).timeout(0)
-            it(`mint should not fail with "Max mint 10 per tx" if mintMany(<10)`, async () => {
+            it(`mintMany should not fail with "Max mint 10 per tx" if mintMany(<10)`, async () => {
                 await concavenft.unpause()
                 await concavenft.setPublicMintActive(true)
                 // expect(await concavenft.totalSupply()).to.equal(200);
@@ -679,7 +817,7 @@ describe("Public Functions", () => {
                     concavenft.connect(thirdParty).mintMany(9)
                 ).to.not.be.revertedWith('Max mint 10 per tx')
             }).timeout(0)
-            it(`mint should fail with "Mint should be > 0" if mintMany(0)`, async () => {
+            it(`mintMany should fail with "Mint should be > 0" if mintMany(0)`, async () => {
                 await concavenft.unpause()
                 await concavenft.setPublicMintActive(true)
                 // expect(await concavenft.totalSupply()).to.equal(200);
@@ -690,7 +828,7 @@ describe("Public Functions", () => {
                     concavenft.connect(thirdParty).mintMany(0)
                 ).to.be.revertedWith('Mint should be > 0')
             }).timeout(0)
-            it(`mint should not fail with "" if mintMany(>0)`, async () => {
+            it(`mintMany should not fail with "" if mintMany(>0)`, async () => {
                 await concavenft.unpause()
                 await concavenft.setPublicMintActive(true)
                 // expect(await concavenft.totalSupply()).to.equal(200);
@@ -714,7 +852,7 @@ describe("Public Functions", () => {
                     concavenft.connect(thirdParty).mintMany(9)
                 ).to.be.revertedWith('exceeds supply')
             }).timeout(0)
-            it(`mint should not fail with "exceeds supply" if totalSupply+_mintAmount<=MAX_SUPPLY`, async () => {
+            it(`mintMany should not fail with "exceeds supply" if totalSupply+_mintAmount<=MAX_SUPPLY`, async () => {
                 await concavenft.unpause()
                 await concavenft.setPublicMintActive(true)
                 // expect(await concavenft.totalSupply()).to.equal(200);
@@ -727,7 +865,7 @@ describe("Public Functions", () => {
             }).timeout(0)
         })
         describe("insufficent funds check",() => {
-            it(`mint should fail with "insufficient funds" if msg.value < price`, async () => {
+            it(`mintMany should fail with "insufficient funds" if msg.value < price`, async () => {
                 await concavenft.unpause()
                 await concavenft.setPublicMintActive(true)
                 // expect(await concavenft.totalSupply()).to.equal(200);
@@ -738,7 +876,7 @@ describe("Public Functions", () => {
                     concavenft.connect(thirdParty).mintMany(5)
                 ).to.be.revertedWith('insufficient funds')
             }).timeout(0)
-            it(`mint should pass if msg.value >= price`, async () => {
+            it(`mintMany should pass if msg.value >= price`, async () => {
                 await concavenft.unpause()
                 await concavenft.setPublicMintActive(true)
                 // expect(await concavenft.totalSupply()).to.equal(200);
@@ -760,5 +898,5 @@ describe("Public Functions", () => {
             }).timeout(0)
         })
     })
-    */
+
 })

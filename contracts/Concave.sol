@@ -129,7 +129,7 @@ contract ConcaveNFT is ERC721Enumerable, Pausable, Ownable {
         uint256 _totalSupply = totalSupply();
         require(!_isPublicMintActiveInternal(_totalSupply),"presale over");
         require(tokenIds.length <= maxMintAmount,"Max mint 10 per tx");
-        require(tokenIds.length > 0,"Minting 0.");
+        require(tokenIds.length > 0,"Mint should be > 0");
 
 
         for (uint256 i = 0; i < tokenIds.length; i++) {
