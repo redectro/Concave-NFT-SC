@@ -1,6 +1,34 @@
 const { expect } = require("chai");
 const { ethers, waffle } = require("hardhat");
 
+/**
+ Contract Constants & Variables
+ */
+const THE_COLORS = '0x9fdb31F8CE3cB8400C7cCb2299492F2A498330a4';
+const TREASURY = '0x48aE900E9Df45441B2001dB4dA92CE0E7C08c6d2';
+const MAX_SUPPLY = 4317;
+const TOTAL_COLORS_QUOTA = 200;
+
+const _name = 'ConcaveName';
+const _symbol = 'ConcaveSymbol';
+const _initBaseURI = 'ipfs://BaseURI/';
+const _initNotRevealedUri = 'ipfs://unrevealedURI/';
+const maxMintAmount = 10;
+const price_in_ether = 0.04;
+const price = ethers.utils.parseEther(price_in_ether.toString());
+const revealed = false;
+const paused = true;
+
+/**
+ Helper Variables
+ */
+let ConcaveNFT;
+let concavenft;
+let deployer;
+let thirdParty;
+
+const colorsOwner = "0xfA8F061675f46CB9e71308BDf3C1C15E35011AC2"
+let colorsOwnerSigner;
 const listColorsHolders = [
     ["0x5feAf84dca91666f812B8405F4B275Eec4fe7AA2",28],
     ["0x268169A19bCa3435451207f70be15436ed142f42",32],
@@ -14,31 +42,9 @@ const listColorsHolders = [
     // ["0x6dEa5dCFa64DC0bb4E5AC53A375A4377CF4eD0Ee",6]
 
 ]
-
-const colorsOwner = "0xfA8F061675f46CB9e71308BDf3C1C15E35011AC2"
-const colorsAddress = "0x9fdb31F8CE3cB8400C7cCb2299492F2A498330a4"
-let colorsOwnerSigner;
-
-const THE_COLORS = '0x9fdb31F8CE3cB8400C7cCb2299492F2A498330a4';
-const TREASURY = '0x48aE900E9Df45441B2001dB4dA92CE0E7C08c6d2';
-const MAX_SUPPLY = 4317;
-const TOTAL_COLORS_QUOTA = 200;
-
-
-const _name = 'ConcaveName';
-const _symbol = 'ConcaveSymbol';
-const _initBaseURI = 'ipfs://BaseURI/';
-const _initNotRevealedUri = 'ipfs://unrevealedURI/';
-const maxMintAmount = 10;
-const price_in_ether = 0.04;
-const price = ethers.utils.parseEther(price_in_ether.toString());
-const revealed = false;
-const paused = true;
-
-let ConcaveNFT;
-let concavenft;
-let deployer;
-let thirdParty;
+/**
+ Helper Functions
+ */
 const deploy = async () => {
     [deployer,thirdParty] =  await ethers.getSigners();
     ConcaveNFT = await ethers.getContractFactory("ConcaveNFT");
@@ -49,15 +55,6 @@ const deploy = async () => {
         _initNotRevealedUri
     );
     console.log('>_')
-}
-
-const mintThirdParty = async (_mintAmount) => {
-    let quota = _mintAmount;
-    while (quota > 0) {
-        let toMint = quota > 10 ? 10 : quota
-        await concavenft.connect(thirdParty).mint(toMint,{value:ethers.utils.parseEther((price_in_ether*toMint).toString())})
-        quota-=toMint;
-    }
 }
 
 const getColorsMinter = async () => {
@@ -72,6 +69,22 @@ const getColorsMinter = async () => {
     colorsOwnerSigner = await ethers.provider.getSigner(colorsOwner);
 }
 
+const mint = async (colorsOwnerSigner,_mintAmount) => {
+    let unminted = (await concavenft.getUnmintedSpoonsByUser(colorsOwner)).filter(d => d < 9000)
+    await concavenft.connect(colorsOwnerSigner).mintColorsBatch(unminted.filter((d,i) => i < _mintAmount));
+}
+const mintThirdParty = async (_mintAmount) => {
+    let quota = _mintAmount;
+    while (quota > 0) {
+        let toMint = quota > 10 ? 10 : quota
+        if (toMint > 1) {
+            await concavenft.connect(thirdParty).mintMany(toMint,{value:ethers.utils.parseEther((price_in_ether*toMint).toString())})
+        } else {
+            await concavenft.connect(thirdParty).mint({value:ethers.utils.parseEther((price_in_ether*toMint).toString())})
+        }
+        quota-=toMint;
+    }
+}
 const getNewColorsMinter = async (address) => {
     await hre.network.provider.request({
       method: "hardhat_impersonateAccount",
@@ -84,25 +97,6 @@ const getNewColorsMinter = async (address) => {
     let signer = await ethers.provider.getSigner(address);
     return signer
 }
-
-const fundBalances = async () => {
-    for (var i = 0; i < listColorsHolders.length; i++) {
-
-        await network.provider.send("hardhat_setBalance", [
-          listColorsHolders[i][0],
-          ethers.utils.parseEther('100.0').toHexString().replace("0x0", "0x"),
-        ]);
-    }
-    await network.provider.send("hardhat_setBalance", [
-      deployer.address,
-      ethers.utils.parseEther('100.0').toHexString().replace("0x0", "0x"),
-    ]);
-    await network.provider.send("hardhat_setBalance", [
-      thirdParty.address,
-      ethers.utils.parseEther('100.0').toHexString().replace("0x0", "0x"),
-    ]);
-}
-
 const mintAllColorsHolders = async () => {
     for (var i = 0; i < listColorsHolders.length; i++) {
         const [address, amount] = listColorsHolders[i];
@@ -111,18 +105,15 @@ const mintAllColorsHolders = async () => {
 
         while (unminted.length > 0) {
             let toMint = unminted.filter((d,i) => i < 10);
-            await concavenft.connect(signer).mintBatch(toMint)
+            await concavenft.connect(signer).mintColorsBatch(toMint)
             unminted =  unminted.filter((d,i) => i >= 10)
         }
     }
 }
-
-const mint = async (colorsOwnerSigner,_mintAmount) => {
-    let unminted = (await concavenft.getUnmintedSpoonsByUser(colorsOwner)).filter(d => d < 9000)
-    await concavenft.connect(colorsOwnerSigner).mintBatch(unminted.filter((d,i) => i < _mintAmount));
-}
-
-
+/**
+ TESTS
+ */
+/*
 describe("ConcaveNFT: Reads public constants", () => {
     before(deploy)
     it(`THE_COLORS is "${THE_COLORS}"`, async () => {
@@ -358,6 +349,7 @@ describe("ConcaveNFT: Owner functions", () => {
             ).to.equal(`${_initBaseURI}0.json`)
         })
     })
+
     describe("withdraw()", () => {
         it(`after succesfull sellout - contract balance should equal ${ethers.utils.formatEther(ethers.utils.parseEther((price_in_ether*(MAX_SUPPLY-TOTAL_COLORS_QUOTA)).toString()))}`, async () => {
             await concavenft.unpause()
@@ -477,187 +469,44 @@ describe("ConcaveNFT: Owner functions", () => {
             ).to.equal(ethers.utils.parseEther((0).toString()))
         }).timeout(0);
     })
+
     // it(``, async () => {})
 })
-
+*/
 describe("Public Functions", () => {
     beforeEach(deploy)
-    describe("mint()", () => {
-        // modifiers
+    describe('mint()', () => {
         describe("whenNotPaused",() => {
             it(`mint should fail with "Pausable: paused" if minting when paused`, async () => {
                 await expect(
-                    concavenft.connect(thirdParty).mint(1)
+                    concavenft.connect(thirdParty).mint()
                 ).to.be.revertedWith('Pausable: paused')
             })
             it(`mint should not fail with "Pausable: paused" if minting when not paused`, async () => {
                 await concavenft.unpause()
                 await expect(
-                    concavenft.connect(thirdParty).mint(1)
+                    concavenft.connect(thirdParty).mint()
                 ).to.not.be.revertedWith('Pausable: paused')
             })
         })
-        // general conditions
-        describe("General Conditions", () => {
-            it(`mint should fail with "Max mint 10 per tx" if minting more than 10`, async () => {
+        describe("public sale active check",() => {
+            it(`mint should fail with "public sale not active" if public sale not active yet`, async () => {
                 await concavenft.unpause()
-                await mintAllColorsHolders()
                 await expect(
-                    concavenft.connect(thirdParty).mint(11)
-                ).to.be.revertedWith('Max mint 10 per tx')
-            }).timeout(0);
-            it(`mint should fail with "Mint should be > 0" if minting 0`, async () => {
-                await concavenft.unpause()
-                await mintAllColorsHolders()
-                await expect(
-                    concavenft.connect(thirdParty).mint(0)
-                ).to.be.revertedWith('Mint should be > 0')
-            }).timeout(0);
-            it(`succesfull sell out - 200 mints by holders and remaining by third party`, async () => {
+                    concavenft.connect(thirdParty).mint()
+                ).to.be.revertedWith('public sale not active')
+            })
+            it(`mint should not fail with "sold out" if isSoldOut=true`, async () => {
                 await concavenft.unpause()
                 await mintAllColorsHolders()
                 expect(await concavenft.totalSupply()).to.equal(200);
                 await mintThirdParty(MAX_SUPPLY - 200)
                 expect(await concavenft.totalSupply()).to.equal(MAX_SUPPLY);
-            }).timeout(0)
-            it(`mint should fail with "not enough supply" if minting would exceed supply`, async () => {
-                await concavenft.unpause()
-                await mintAllColorsHolders()
-                expect(await concavenft.totalSupply()).to.equal(200);
-                await mintThirdParty(MAX_SUPPLY - 200)
-                expect(await concavenft.totalSupply()).to.equal(MAX_SUPPLY);
+                expect(await concavenft.isSoldOut()).to.equal(true);
                 await expect(
-                    concavenft.connect(thirdParty).mint(1,{value:ethers.utils.parseEther((price_in_ether).toString())})
-                ).to.be.revertedWith('sold out')
+                    concavenft.connect(thirdParty).mint()
+                ).to.not.be.revertedWith('Pausable: paused')
             }).timeout(0)
-        })
-        // first 200 mints
-        describe("first 200 mints", () => {
-            it(`mint should fail with "Not Colors Owner" if supply is < 200 and caller is non-colors holder`, async () => {
-                await concavenft.unpause()
-                await mintAllColorsHolders()
-                expect(await concavenft.totalSupply()).to.equal(200);
-            }).timeout(0)
-            // it(`mint should fail with "Already minted your quota" if supply is < 200 and caller is colors holder minting more than quota`, async () => {
-            //     await concavenft.unpause()
-            //     // ["0xEeAf86E05A95261290a871Dd8cdB9470D5D3c9B7", 10],
-            //     const signer = await getNewColorsMinter('0xEeAf86E05A95261290a871Dd8cdB9470D5D3c9B7')
-            //     await concavenft.connect(signer).mint(10)
-            //     await expect(
-            //         concavenft.connect(signer).mint(1)
-            //     ).to.be.revertedWith('Already minted your quota')
-            // }).timeout(0)
-            it(`mint should pass for the first 200 colors holders minting within quota`, async () => {
-                await concavenft.unpause()
-                await mintAllColorsHolders()
-                expect(await concavenft.totalSupply()).to.equal(200);
-            }).timeout(0)
-        })
-        // // after 200 mints
-        describe("After 200 mints", () => {
-            it(`isPublicMintActive should return true after first 200 mints`, async () => {
-                await concavenft.unpause()
-                await mintAllColorsHolders()
-                expect(await concavenft.totalSupply()).to.equal(200);
-                expect(await concavenft.isPublicMintActive()).to.equal(true);
-            }).timeout(0)
-            it(`mint should fail with "insufficient funds" if value isnt >= price*_mintAmount`, async () => {
-                // await fundBalances()
-                await concavenft.unpause()
-                await mintAllColorsHolders()
-                expect(await concavenft.totalSupply()).to.equal(200);
-                expect(await concavenft.isPublicMintActive()).to.equal(true);
-                await expect(
-                    concavenft.connect(thirdParty).mint(1)
-                )
-                // .to.be.revertedWith('insufficient funds')
-                .to.be.reverted
-                await expect(
-                    concavenft.connect(thirdParty).mint(2,{value:ethers.utils.parseEther((price_in_ether).toString())})
-                )
-                .to.be.reverted
-                // .to.be.revertedWith('insufficient funds')
-            }).timeout(0)
-            it('mint should pass if supply>200, value>price*_mintAmount if not colors holder', async () => {
-                await concavenft.unpause()
-                await mintAllColorsHolders()
-                expect(await concavenft.totalSupply()).to.equal(200);
-                expect(await concavenft.isPublicMintActive()).to.equal(true);
-                await concavenft.connect(thirdParty).mint(1,{value:ethers.utils.parseEther((price_in_ether).toString())})
-                await concavenft.connect(thirdParty).mint(2,{value:ethers.utils.parseEther((price_in_ether*2).toString())})
-                expect(await concavenft.totalSupply()).to.equal(203);
-            }).timeout(0)
-            it('mint should fail if supply>200 if value<price*_mintAmount if colors holder', async () => {
-                // await fundBalances()
-                await concavenft.unpause()
-                await mintAllColorsHolders()
-                expect(await concavenft.totalSupply()).to.equal(200);
-                expect(await concavenft.isPublicMintActive()).to.equal(true);
-                await concavenft.connect(thirdParty).mint(1,{value:ethers.utils.parseEther((price_in_ether).toString())})
-                await concavenft.connect(thirdParty).mint(2,{value:ethers.utils.parseEther((price_in_ether*2).toString())})
-                const signer = await getNewColorsMinter('0xEeAf86E05A95261290a871Dd8cdB9470D5D3c9B7')
-                await expect(
-                    concavenft.connect(signer).mint(10)
-                )
-                .to.be.reverted
-                // .to.be.revertedWith('insufficient funds')
-                // expect(await concavenft.totalSupply()).to.equal(203);
-            }).timeout(0)
-            it('mint should pass if supply>200 if value>=price*_mintAmount if colors holder', async () => {
-                await concavenft.unpause()
-                await mintAllColorsHolders()
-                expect(await concavenft.totalSupply()).to.equal(200);
-                expect(await concavenft.isPublicMintActive()).to.equal(true);
-                await concavenft.connect(thirdParty).mint(1,{value:ethers.utils.parseEther((price_in_ether).toString())})
-                await concavenft.connect(thirdParty).mint(2,{value:ethers.utils.parseEther((price_in_ether*2).toString())})
-                const signer = await getNewColorsMinter('0xEeAf86E05A95261290a871Dd8cdB9470D5D3c9B7')
-                await concavenft.connect(signer).mint(10,{value:ethers.utils.parseEther((price_in_ether*10).toString())})
-                expect(await concavenft.totalSupply()).to.equal(213);
-            }).timeout(0)
-        })
-        describe("Manually setting to public before 200 mints", () => {
-            it("if supply < 200 and owner calls setPublicMintActive - mint should fail with 'insufficient funds' if value<price*_mintAmount", async () => {
-                // await fundBalances()
-                await concavenft.unpause()
-                // ["0xEeAf86E05A95261290a871Dd8cdB9470D5D3c9B7", 10],
-                const signer = await getNewColorsMinter('0xEeAf86E05A95261290a871Dd8cdB9470D5D3c9B7')
-                let unminted = (await concavenft.getUnmintedSpoonsByUser('0xEeAf86E05A95261290a871Dd8cdB9470D5D3c9B7')).filter(d => d < 9000)
-                await concavenft.connect(signer).mintBatch(unminted.filter((d,i) => i < 10))
-                await concavenft.setPublicMintActive(true);
-                // await mintThirdParty(10)
-                await expect(
-                    concavenft.connect(thirdParty).mint(10)
-                )
-                .to.be.reverted
-                // .to.be.revertedWith('insufficient funds')
-            })
-            it("if supply < 200 and owner calls setPublicMintActive - mint should pass if value>=price*_mintAmount", async () => {
-                await concavenft.unpause()
-                // ["0xEeAf86E05A95261290a871Dd8cdB9470D5D3c9B7", 10],
-                const signer = await getNewColorsMinter('0xEeAf86E05A95261290a871Dd8cdB9470D5D3c9B7')
-                let unminted = (await concavenft.getUnmintedSpoonsByUser('0xEeAf86E05A95261290a871Dd8cdB9470D5D3c9B7')).filter(d => d < 9000)
-                await concavenft.connect(signer).mintBatch(unminted.filter((d,i) => i < 10))
-                await concavenft.setPublicMintActive(true);
-                // await mintThirdParty(10)
-                await concavenft.connect(thirdParty).mint(10,{value:ethers.utils.parseEther((price_in_ether*10).toString())})
-                expect(await concavenft.totalSupply()).to.equal(20);
-            })
         })
     })
 })
-
-
-
-// TODO:
-// withdraw()
-
-
-
-// const TheColors = await ethers.getContractFactory("TheColors");
-// const thecolors = await TheColors.attach(colorsAddress);
-// let bal = await thecolors.balanceOf('0xEeAf86E05A95261290a871Dd8cdB9470D5D3c9B7')
-// console.log({bal})
-// bal = await concavenft.balanceOf('0xEeAf86E05A95261290a871Dd8cdB9470D5D3c9B7')
-// console.log({bal})
-// console.log('deployer',deployer.address)
-// console.log('concavenft',concavenft.address)
