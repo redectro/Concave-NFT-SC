@@ -54,7 +54,6 @@ contract ConcaveNFT is ERC721Enumerable, Pausable, Ownable {
      The following checks occur, it checks:
       - that the public mint is active
       - whether collection sold out
-      - whether minting 1 would exceed supply.
       - finally checks where value > price
 
      Upon passing checks it calls  the internal _mintOnce function to perform
@@ -68,7 +67,6 @@ contract ConcaveNFT is ERC721Enumerable, Pausable, Ownable {
             "public sale not active"
         );
         require(!_isSoldOut(_totalSupply), "sold out");
-        require(_totalSupply < MAX_SUPPLY, "exceeds supply");
         require(msg.value >= price, "insufficient funds");
         _mintOnce();
     }
@@ -305,7 +303,7 @@ contract ConcaveNFT is ERC721Enumerable, Pausable, Ownable {
 
     function _isPublicMintActiveInternal(uint256 _totalSupply)
         view
-        internal 
+        internal
         returns (bool)
     {
         return _totalSupply >= TOTAL_COLORS_QUOTA || _isPublicMintActive;
