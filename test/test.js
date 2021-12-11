@@ -900,3 +900,66 @@ describe("Public Functions", () => {
     })
 
 })
+
+
+describe("Public View Functions", () => {
+    beforeEach(deploy)
+    describe("isPublicMintActive",() => {
+        it("shoud return false when supply < 200 or _isPublicMintActive=false",async () => {
+            expect(await concavenft.isPublicMintActive()).to.equal(false);
+        }).timeout(0)
+        it("shoud return true when supply >= 200",async () => {
+            await concavenft.unpause()
+            await mintAllColorsHolders()
+            expect(await concavenft.isPublicMintActive()).to.equal(true);
+        }).timeout(0)
+        it("shoud return true when setPublicMintActive set to true even if supply < 200",async () => {
+            await concavenft.setPublicMintActive(true)
+            expect(await concavenft.isPublicMintActive()).to.equal(true);
+        }).timeout(0)
+    })
+    describe("isSoldOut",() => {
+        it(`shoud return false when supply < ${MAX_SUPPLY}`,async () => {
+            await concavenft.unpause()
+            await concavenft.setPublicMintActive(true)
+            await mintThirdParty(2)
+            expect(await concavenft.isSoldOut()).to.equal(false);
+        }).timeout(0)
+        it(`shoud return true when supply = ${MAX_SUPPLY}`,async () => {
+            await concavenft.unpause()
+            await mintAllColorsHolders()
+            expect(await concavenft.totalSupply()).to.equal(200);
+            await mintThirdParty(MAX_SUPPLY - 200)
+            expect(await concavenft.totalSupply()).to.equal(MAX_SUPPLY);
+            expect(await concavenft.isSoldOut()).to.equal(true);
+        }).timeout(0)
+    })
+    describe("getUnmintedSpoonsByUser",() => {
+        it(`shoud return array of unminted colors by colors owner`,async () => {
+            let unminted = (await concavenft.getUnmintedSpoonsByUser(colorsOwner)).filter(d => d < 9000)
+            expect(unminted.length).to.be.greaterThan(0)
+        }).timeout(0)
+        it(`shoud return array of unminted colors by colors owner that matches array from TheColors contract`,async () => {
+            let tokenlist = ['0','1','2','3','4','2620']
+            let unminted = (await concavenft.getUnmintedSpoonsByUser(colorsOwner)).filter(d => d < 9000)
+            expect(unminted.length).to.equal(tokenlist.length)
+            for (var i = 0; i < unminted.length; i++) {
+                expect(unminted[i].toString()).to.equal(tokenlist[i].toString())
+            }
+        }).timeout(0)
+        it(`when minting one - array should exclude minted token`,async () => {
+            let tokenlist = ['0','1','2','3','4','2620']
+            let unminted = (await concavenft.getUnmintedSpoonsByUser(colorsOwner)).filter(d => d < 9000)
+            expect(unminted.length).to.equal(tokenlist.length)
+            for (var i = 0; i < unminted.length; i++) {
+                expect(unminted[i].toString()).to.equal(tokenlist[i].toString())
+            }
+            await concavenft.unpause()
+            await getColorsMinter()
+            await concavenft.connect(colorsOwnerSigner).mintColorsBatch(['0','1','2','3','4']);
+            unminted = (await concavenft.getUnmintedSpoonsByUser(colorsOwner)).filter(d => d < 9000)
+            expect(unminted.length).to.equal(1)
+            expect(unminted[0].toString()).to.equal('2620')
+        }).timeout(0)
+    })
+})

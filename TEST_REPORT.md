@@ -25,20 +25,26 @@ Coverage was done with `npx hardhat coverage` using [https://github.com/sc-forks
 
 ## Approach
 
-All methods, variables, and lines of code were testing from the point of view of how they should behave and how they shouldn't. The `mint()` function is the only `public` non-`view` function not protected by `onlyOwner` - so a particular effort was made in devising as many scenarios as possible to test this function.
+All methods, variables, and lines of code were testing from the point of view of how they should behave and how they shouldn't. The following functions are the only `public` non-`view` functions not protected by `onlyOwner` - so a particular effort was made in devising as many scenarios as possible to test this function:
+
+ - `mint()`
+ - `mintMany(uint256 _mintAmount)`
+ - `mintColorsOnce(uint256 tokenId)`
+ - `mintColorsBatch(uint256[] memory tokenIds)`
+
 
 ## Coverage
 
 100% of Statements, branches, functions, and lines were covered. More detailed information can be found by cloning this repo and opening `coverage/index.html` on a browser.
 
 ```
-66 passing (3m)
+102 passing (20m)
 
 --------------|----------|----------|----------|----------|----------------|
 File          |  % Stmts | % Branch |  % Funcs |  % Lines |Uncovered Lines |
 --------------|----------|----------|----------|----------|----------------|
-contracts/    |      100 |      100 |      100 |      100 |                |
-Concave.sol   |      100 |      100 |      100 |      100 |                |
+contracts/   |      100 |      100 |      100 |      100 |                |
+Concave.sol |      100 |      100 |      100 |      100 |                |
 --------------|----------|----------|----------|----------|----------------|
 All files     |      100 |      100 |      100 |      100 |                |
 --------------|----------|----------|----------|----------|----------------|
@@ -58,6 +64,8 @@ In the below report, `>_` indicates that the contract was redeployed before the 
 yarn run v1.22.10
 warning package.json: No license field
 $ npx hardhat test
+Compiling 15 files with 0.8.4
+Compilation finished successfully
 
   ConcaveNFT: Reads public constants
 >_
@@ -196,103 +204,174 @@ Treasury                                   + 98.808 (60 %)
         ✓ mint should fail with "Pausable: paused" if minting when paused
 >_
         ✓ mint should not fail with "Pausable: paused" if minting when not paused
-      General Conditions
+      public sale active check
 >_
-        ✓ mint should fail with "Max mint 10 per tx" if minting more than 10
+        ✓ mint should fail with "public sale not active" if public sale not active yet
 >_
-        ✓ succesfull sell out - 200 mints by holders and remaining by third party
+        ✓ mint should not fail with "public sale not active" if public sale is active
+      sold out check
 >_
-        ✓ mint should fail with "not enough supply" if minting would exceed supply
-      first 200 mints
+        ✓ mint should fail with "sold out" if isSoldOut=true
 >_
-        ✓ mint should fail with "Not Colors Owner" if supply is < 200 and caller is non-colors holder
+        ✓ mint should not fail with "sold out" if isSoldOut=false
+      insufficent funds check
 >_
-        ✓ mint should fail with "Already minted your quota" if supply is < 200 and caller is colors holder minting more than quota
+        ✓ mint should fail with "insufficient funds" if msg.value < price
 >_
-        ✓ mint should pass for the first 200 colors holders minting within quota
-      After 200 mints
+        ✓ mint should pass if msg.value >= price
+      counting
 >_
-        ✓ isPublicMintActive should return true after first 200 mints
+        ✓ totalSupply should increase by 1 after mint()
+    mintColorsBatch()
+      whenNotPaused
 >_
-        ✓ mint should fail with "insufficient funds" if value isnt >= price*_mintAmount
+        ✓ mintColorsBatch should fail with "Pausable: paused" if minting when paused
 >_
-        ✓ mint should pass if supply>200, value>price*_mintAmount if not colors holder
+        ✓ mintColorsBatch should not fail with "Pausable: paused" if minting when not paused
+      presale check
 >_
-        ✓ mint should fail if supply>200 if value<price*_mintAmount if colors holder
+        ✓ mintColorsBatch should fail with "presale over" if public sale not active yet
 >_
-        ✓ mint should pass if supply>200 if value>=price*_mintAmount if colors holder
-      Manually setting to public before 200 mints
+        ✓ mintColorsBatch should not fail with "presale over" if public sale is active
+      max mint 10 check, min mint 0 check
 >_
-        ✓ if supply < 200 and owner calls setPublicMintActive - mint should fail with 'insufficient funds' if value<price*_mintAmount
+        ✓ mintColorsBatch should fail with "Max mint 10 per tx" if mintColorsBatch(>10)
 >_
-        ✓ if supply < 200 and owner calls setPublicMintActive - mint should pass if value>=price*_mintAmount
+        ✓ mintColorsBatch should not fail with "Max mint 10 per tx" if mintColorsBatch(<10)
+>_
+        ✓ mintColorsBatch should fail with "Mint should be > 0" if mintColorsBatch(0)
+>_
+        ✓ mintColorsBatch should not fail with "Mint should be > 0" if mintColorsBatch(>0)
+      claimed token check
+>_
+        ✓ shoud fail not fail with "Color already claimed." if tokenId not claimed
+>_
+        ✓ shoud fail with "Color already claimed." if tokenId already claimed
+      owner of token check
+>_
+        ✓ shoud fail not fail with "Only owner can claim." if owner is sender
+>_
+        ✓ shoud fail with "Only owner can claim." if owner is not sender
+    mintColorsOnce()
+      whenNotPaused
+>_
+        ✓ mintColorsOnce should fail with "Pausable: paused" if minting when paused
+>_
+        ✓ mintColorsBatch should not fail with "Pausable: paused" if minting when not paused
+      presale check
+>_
+        ✓ mintColorsOnce should fail with "presale over" if public sale not active yet
+>_
+        ✓ mintColorsBatch should not fail with "presale over" if public sale is active
+      claimed token check
+>_
+        ✓ shoud fail not fail with "Color already claimed." if tokenId not claimed
+>_
+        ✓ shoud fail with "Color already claimed." if tokenId already claimed
+      owner of token check
+>_
+        ✓ shoud fail not fail with "Only owner can claim." if owner is sender
+>_
+        ✓ shoud fail with "Only owner can claim." if owner is not sender
+    mintMany()
+      whenNotPaused
+>_
+        ✓ mintMany should fail with "Pausable: paused" if minting when paused
+>_
+        ✓ mintMany should not fail with "Pausable: paused" if minting when not paused
+      public sale active check
+>_
+        ✓ mintMany should fail with "public sale not active" if public sale not active yet
+>_
+        ✓ mintMany should not fail with "public sale not active" if public sale is active
+      sold out check
+>_
+        ✓ mintMany should fail with "sold out" if isSoldOut=true
+>_
+        ✓ mintMany should not fail with "sold out" if isSoldOut=false
+      max mint 10 check, min mint 0 check
+>_
+        ✓ mintMany should fail with "Max mint 10 per tx" if mintMany(>10)
+>_
+        ✓ mintMany should not fail with "Max mint 10 per tx" if mintMany(<10)
+>_
+        ✓ mintMany should fail with "Mint should be > 0" if mintMany(0)
+>_
+        ✓ mintMany should not fail with "" if mintMany(>0)
+      exceeds supply
+>_
+        ✓ mintMany should fail with "exceeds supply" if totalSupply+_mintAmount>MAX_SUPPLY
+>_
+        ✓ mintMany should not fail with "exceeds supply" if totalSupply+_mintAmount<=MAX_SUPPLY
+      insufficent funds check
+>_
+        ✓ mintMany should fail with "insufficient funds" if msg.value < price
+>_
+        ✓ mintMany should pass if msg.value >= price
+      counting
+>_
+        ✓ totalSupply should increase by 5 after mintMany(5)
 
+  Public View Functions
+    isPublicMintActive
+>_
+      ✓ shoud return false when supply < 200 or _isPublicMintActive=false
+>_
+      ✓ shoud return true when supply >= 200
+>_
+      ✓ shoud return true when setPublicMintActive set to true even if supply < 200
+    isSoldOut
+>_
+      ✓ shoud return false when supply < 4317
+>_
+      ✓ shoud return true when supply = 4317
+    getUnmintedSpoonsByUser
+>_
+      ✓ shoud return array of unminted colors by colors owner
+>_
+      ✓ shoud return array of unminted colors by colors owner that matches array from TheColors contract
+>_
+      ✓ when minting one - array should exclude minted token
 
-  65 passing (2m)
-
-✨  Done in 126.35s.
-☁  Concave-NFT-SC [main] ⚡
-```
-
-## Gas Usage
-
-The following report is of the gas usage during all the functions. Particularly notable is the `mint()` function costing an average of `1,193,097` gas in 1938 runs. The majority of the `mint()` calls in this test were calls to mint the maximum number of tokens - 10 - `mint(10)`.
-
-Below this table is a report of the mint function when minting only 1 - `mint(1)`.
-
-```
 ·--------------------------------------|----------------------------|-------------|-----------------------------·
 |         Solc version: 0.8.4          ·  Optimizer enabled: false  ·  Runs: 200  ·  Block limit: 30000000 gas  │
 ·······································|····························|·············|······························
-|  Methods                             ·               100 gwei/gas               ·       4197.40 usd/eth       │
+|  Methods                             ·               100 gwei/gas               ·       4036.34 usd/eth       │
 ···············|·······················|·············|··············|·············|···············|··············
 |  Contract    ·  Method               ·  Min        ·  Max         ·  Avg        ·  # calls      ·  usd (avg)  │
 ···············|·······················|·············|··············|·············|···············|··············
-|  ConcaveNFT  ·  mint                 ·     159911  ·     1254567  ·    1193097  ·         1938  ·     500.79  │
+|  ConcaveNFT  ·  mint                 ·     129767  ·      153126  ·     137553  ·            3  ·      55.52  │
 ···············|·······················|·············|··············|·············|···············|··············
-|  ConcaveNFT  ·  pause                ·          -  ·           -  ·      28121  ·            2  ·      11.80  │
+|  ConcaveNFT  ·  mintColorsBatch      ·     159906  ·     1468752  ·    1241978  ·          217  ·     501.30  │
 ···············|·······················|·············|··············|·············|···············|··············
-|  ConcaveNFT  ·  reveal               ·          -  ·           -  ·      45798  ·            3  ·      19.22  │
+|  ConcaveNFT  ·  mintColorsOnce       ·          -  ·           -  ·     156401  ·            5  ·      63.13  │
 ···············|·······················|·············|··············|·············|···············|··············
-|  ConcaveNFT  ·  setBaseURI           ·      26971  ·       32018  ·      31004  ·            5  ·      13.01  │
+|  ConcaveNFT  ·  mintMany             ·     248736  ·     1201279  ·    1199322  ·         2475  ·     484.09  │
 ···············|·······················|·············|··············|·············|···············|··············
-|  ConcaveNFT  ·  setMaxMintAmount     ·          -  ·           -  ·      29049  ·            5  ·      12.19  │
+|  ConcaveNFT  ·  pause                ·          -  ·           -  ·      28099  ·            2  ·      11.34  │
 ···············|·······················|·············|··············|·············|···············|··············
-|  ConcaveNFT  ·  setNotRevealedURI    ·      27057  ·       32104  ·      31090  ·            5  ·      13.05  │
+|  ConcaveNFT  ·  reveal               ·          -  ·           -  ·      45754  ·            3  ·      18.47  │
 ···············|·······················|·············|··············|·············|···············|··············
-|  ConcaveNFT  ·  setPrice             ·          -  ·           -  ·      29025  ·            5  ·      12.18  │
+|  ConcaveNFT  ·  setBaseURI           ·      27080  ·       32127  ·      31113  ·            5  ·      12.56  │
 ···············|·······················|·············|··············|·············|···············|··············
-|  ConcaveNFT  ·  setPublicMintActive  ·      24295  ·       46207  ·      43077  ·            7  ·      18.08  │
+|  ConcaveNFT  ·  setMaxMintAmount     ·          -  ·           -  ·      28960  ·            5  ·      11.69  │
 ···············|·······················|·············|··············|·············|···············|··············
-|  ConcaveNFT  ·  unpause              ·          -  ·           -  ·      28118  ·           23  ·      11.80  │
+|  ConcaveNFT  ·  setNotRevealedURI    ·      27035  ·       32082  ·      31068  ·            5  ·      12.54  │
 ···············|·······················|·············|··············|·············|···············|··············
-|  ConcaveNFT  ·  withdraw             ·     121614  ·      321614  ·     221614  ·            2  ·      93.02  │
+|  ConcaveNFT  ·  setPrice             ·          -  ·           -  ·      29025  ·            5  ·      11.72  │
 ···············|·······················|·············|··············|·············|···············|··············
-|  Deployments                         ·                                          ·  % of limit   ·             │
-·······································|·············|··············|·············|···············|··············
-|  ConcaveNFT                          ·          -  ·           -  ·    4630855  ·       15.4 %  ·    1943.76  │
-·--------------------------------------|-------------|--------------|-------------|---------------|-------------·
-
-```
-
-Minting only 1 - `mint(1)` - costs an average of `167,240` in gas:
-
-```
-·--------------------------------------|----------------------------|-------------|-----------------------------·
-|         Solc version: 0.8.4          ·  Optimizer enabled: false  ·  Runs: 200  ·  Block limit: 30000000 gas  │
-·······································|····························|·············|······························
-|  Methods                             ·               100 gwei/gas               ·       4162.64 usd/eth       │
+|  ConcaveNFT  ·  setPublicMintActive  ·      24207  ·       46119  ·      45166  ·           23  ·      18.23  │
 ···············|·······················|·············|··············|·············|···············|··············
-|  Contract    ·  Method               ·  Min        ·  Max         ·  Avg        ·  # calls      ·  usd (avg)  │
+|  ConcaveNFT  ·  unpause              ·          -  ·           -  ·      28118  ·           53  ·      11.35  │
 ···············|·······················|·············|··············|·············|···············|··············
-|  ConcaveNFT  ·  mint                 ·     159911  ·     1234541  ·     167240  ·         5327  ·      69.62  │
-···············|·······················|·············|··············|·············|···············|··············
-|  ConcaveNFT  ·  setPublicMintActive  ·          -  ·           -  ·      46207  ·            2  ·      19.23  │
-···············|·······················|·············|··············|·············|···············|··············
-|  ConcaveNFT  ·  unpause              ·          -  ·           -  ·      28118  ·            8  ·      11.70  │
+|  ConcaveNFT  ·  withdraw             ·     121614  ·      321614  ·     221614  ·            2  ·      89.45  │
 ···············|·······················|·············|··············|·············|···············|··············
 |  Deployments                         ·                                          ·  % of limit   ·             │
 ·······································|·············|··············|·············|···············|··············
-|  ConcaveNFT                          ·          -  ·           -  ·    4630855  ·       15.4 %  ·    1927.66  │
+|  ConcaveNFT                          ·          -  ·           -  ·    5313095  ·       17.7 %  ·    2144.55  │
 ·--------------------------------------|-------------|--------------|-------------|---------------|-------------·
+
+  102 passing (15m)
+
+✨  Done in 898.80s.
 ```
