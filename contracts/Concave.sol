@@ -41,7 +41,7 @@ contract ConcaveNFT is ERC721Enumerable, Pausable, Ownable {
         string memory _symbol,
         string memory _initBaseURI,
         string memory _initNotRevealedUri
-    ) ERC721(_name, _symbol) {
+    ) ERC721("The Concave Spoons", "SPOON") {
         baseURI = _initBaseURI;
         notRevealedUri = _initNotRevealedUri;
         _pause();
