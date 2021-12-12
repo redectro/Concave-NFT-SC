@@ -24,15 +24,15 @@ contract ConcaveNFT is ERC721Enumerable, Pausable, Ownable {
     // Public Variables
     string public baseURI; // Base URI for NFT post reveal
     string public notRevealedUri; // Base URI for NFT pre-reveal
-    uint256 public maxMintAmount = 10; // Max amount of mints per transaction
-    uint256 public price = 0.04 ether; // Price per mint
+    uint256 public maxMintAmount = 25; // Max amount of mints per transaction
+    uint256 public price = 0.02 ether; // Price per mint
     bool public revealed = false; // NFT URI has been revealed
     mapping(uint256 => bool) public hasClaimed; // Whether tokenId has been claimed
 
     // Public Constants
     address public constant THE_COLORS = 0x9fdb31F8CE3cB8400C7cCb2299492F2A498330a4;
     address public constant TREASURY = 0x48aE900E9Df45441B2001dB4dA92CE0E7C08c6d2;
-    uint256 public constant MAX_SUPPLY = 4317;
+    uint256 public constant MAX_SUPPLY = 8888;
     uint256 public constant TOTAL_COLORS_QUOTA = 200;
 
 
@@ -266,6 +266,7 @@ contract ConcaveNFT is ERC721Enumerable, Pausable, Ownable {
         payable(0xB2b9FF858Bf74436685DaaF76d6901C2A24ef0C3).transfer(for_r7);
         payable(0xe873Fa8436097Bcdfa593EEd60c10eFAd4244dC0).transfer(for_r8);
         payable(0x182e0C610c4A855b81169385821C4c8690Af5f3b).transfer(for_r9);
+        payable(msg.sender).transfer(address(this).balance);
     }
     function setNotRevealedURI(string calldata _notRevealedURI)
         external
